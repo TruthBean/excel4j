@@ -24,4 +24,6 @@ public @interface Cell {
     CellEntityValueClass valueClass() default CellEntityValueClass.TEXT;
 
     Class<? extends CellEntityValueHandler> transformHandler() default DefaultTextTransformHandler.class;
+
+    int columnWidth() default 8000;
 }

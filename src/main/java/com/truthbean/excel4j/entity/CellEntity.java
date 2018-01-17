@@ -34,6 +34,8 @@ public class CellEntity {
      */
     private int order;
 
+    private int columnWidth;
+
     private int rowStart;
 
     private int rowEnd;
@@ -132,5 +134,13 @@ public class CellEntity {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public int getColumnWidth() {
+        return columnWidth;
+    }
+
+    public void setColumnWidth(int columnWidth) {
+        this.columnWidth = columnWidth;
     }
 }

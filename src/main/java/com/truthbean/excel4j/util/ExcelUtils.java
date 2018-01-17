@@ -34,21 +34,6 @@ public final class ExcelUtils {
     }
 
     /**
-     * 标题样式
-     */
-    private static CellStyle BIG_TITLE_STYLE = null;
-
-    /**
-     * 标题行样式
-     */
-    private static CellStyle TITLE_STYLE = null;
-
-    /**
-     * 行信息内容样式
-     */
-    private static CellStyle CONTENT_STYLE = null;
-
-    /**
      * 是否是2003格式的excel
      * @param filePath 文件路径
      * @return boolean
@@ -217,7 +202,7 @@ public final class ExcelUtils {
         }
 
         first.setCellValue(str);
-        first.setCellStyle(BIG_TITLE_STYLE);
+        first.setCellStyle(CellStyleHelper.setBigTitleDefaultStyle(workbook));
         bigTitleRow.setHeightInPoints(22);
 
         //第二行，标题行
@@ -233,7 +218,7 @@ public final class ExcelUtils {
             cell = titleRow.createCell(k);
 
             //设置标题样式
-            cell.setCellStyle(TITLE_STYLE);
+            cell.setCellStyle(CellStyleHelper.setTitleDefaultStyle(workbook));
             cell.setCellType(CellType.STRING);
             cell.setCellValue(titleStrs[k]);
             //设置列宽

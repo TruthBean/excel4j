@@ -76,6 +76,8 @@ public class ExcelEntityHandler<T> {
                 title.setValue(cell.column());
                 title.setValueClass(CellEntityValueClass.TEXT);
                 title.setOrder(cell.order());
+                title.setColumnWidth(cell.columnWidth());
+
                 titles.add(title);
             }
 
