@@ -13,13 +13,13 @@ import java.util.Date;
 @Sheet(name = "测试SHEET", bigTitle = "测试....")
 public class CellEntityTest {
 
-    @Cell(order = 2, column = "ID", valueClass = CellEntityValueClass.DOUBLE)
+    @Cell(order = 2, column = "ID", valueClass = CellEntityValueClass.DOUBLE, columnWidth = 2864)
     private int id;
 
     @Cell(order = 1, column = "ShortNum", valueClass = CellEntityValueClass.DOUBLE)
     private long shortNum;
 
-    @Cell(order = 3, column = "用户名", valueClass = CellEntityValueClass.TEXT)
+    @Cell(order = 3, column = "用户名", valueClass = CellEntityValueClass.TEXT, columnWidth = 9000)
     private String userName;
 
     @Cell(order = 5, column = "时间", valueClass = CellEntityValueClass.DATE)
@@ -27,6 +27,8 @@ public class CellEntityTest {
 
     @Cell(order = 4, column = "金额", valueClass = CellEntityValueClass.DOUBLE)
     private BigDecimal decimal;
+
+    private Exception exception;
 
     public String getUserName() {
         return userName;
@@ -66,5 +68,13 @@ public class CellEntityTest {
 
     public void setShortNum(long shortNum) {
         this.shortNum = shortNum;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
     }
 }

@@ -10,8 +10,6 @@ public final class CellStyleHelper {
     private CellStyleHelper() {
     }
 
-    private static volatile CellStyle BIG_TITLE_STYLE;
-
     public static CellStyle setBigTitleDefaultStyle(Workbook workbook) {
         // 设置列标题字体，样式
         Font bigTitleFont = workbook.createFont();
@@ -24,59 +22,49 @@ public final class CellStyleHelper {
         short heightInPoints = 16;
         bigTitleFont.setFontHeightInPoints(heightInPoints);
 
-        if (BIG_TITLE_STYLE == null) {
-            BIG_TITLE_STYLE = workbook.createCellStyle();
-            // 设置边框
-            BIG_TITLE_STYLE.setBorderTop(BorderStyle.THIN);
-            BIG_TITLE_STYLE.setBorderBottom(BorderStyle.THIN);
-            BIG_TITLE_STYLE.setBorderLeft(BorderStyle.THIN);
-            BIG_TITLE_STYLE.setBorderRight(BorderStyle.THIN);
-            BIG_TITLE_STYLE.setVerticalAlignment(VerticalAlignment.CENTER);
-            BIG_TITLE_STYLE.setAlignment(HorizontalAlignment.CENTER);
-            BIG_TITLE_STYLE.setFont(bigTitleFont);
-        }
+        CellStyle bigTitleStyle = workbook.createCellStyle();
+        // 设置边框
+        bigTitleStyle.setBorderTop(BorderStyle.THIN);
+        bigTitleStyle.setBorderBottom(BorderStyle.THIN);
+        bigTitleStyle.setBorderLeft(BorderStyle.THIN);
+        bigTitleStyle.setBorderRight(BorderStyle.THIN);
+        bigTitleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        bigTitleStyle.setAlignment(HorizontalAlignment.CENTER);
+        bigTitleStyle.setFont(bigTitleFont);
 
-        return BIG_TITLE_STYLE;
+        return bigTitleStyle;
     }
-
-    private static volatile CellStyle TITLE_STYLE;
 
     public static CellStyle setTitleDefaultStyle(Workbook workbook) {
-        if (TITLE_STYLE == null) {
-            // 标题列样式
-            TITLE_STYLE = workbook.createCellStyle();
-            Font titleFont = workbook.createFont();
-            titleFont.setBold(true);
-            // 设置边框
-            TITLE_STYLE.setBorderTop(BorderStyle.THIN);
-            TITLE_STYLE.setBorderBottom(BorderStyle.THIN);
-            TITLE_STYLE.setBorderLeft(BorderStyle.THIN);
-            TITLE_STYLE.setBorderRight(BorderStyle.THIN);
-            TITLE_STYLE.setVerticalAlignment(VerticalAlignment.CENTER);
-            TITLE_STYLE.setAlignment(HorizontalAlignment.CENTER);
-            titleFont.setColor(IndexedColors.WHITE.getIndex());
-            TITLE_STYLE.setFont(titleFont);
-            TITLE_STYLE.setFillForegroundColor(IndexedColors.ROYAL_BLUE.getIndex());
-            TITLE_STYLE.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        }
+        // 标题列样式
+        CellStyle titleStyle = workbook.createCellStyle();
 
-        return TITLE_STYLE;
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        // 设置边框
+        titleStyle.setBorderTop(BorderStyle.THIN);
+        titleStyle.setBorderBottom(BorderStyle.THIN);
+        titleStyle.setBorderLeft(BorderStyle.THIN);
+        titleStyle.setBorderRight(BorderStyle.THIN);
+        titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        titleStyle.setAlignment(HorizontalAlignment.CENTER);
+        titleFont.setColor(IndexedColors.WHITE.getIndex());
+        titleStyle.setFont(titleFont);
+        titleStyle.setFillForegroundColor(IndexedColors.ROYAL_BLUE.getIndex());
+        titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        return titleStyle;
     }
 
-    private static volatile CellStyle CONTENT_STYLE;
-
     public static CellStyle setContentDefaultStyle(Workbook workbook) {
-        if (CONTENT_STYLE == null) {
-            // 内容列样式
-            CONTENT_STYLE = workbook.createCellStyle();
-            CONTENT_STYLE.setBorderTop(BorderStyle.THIN);
-            CONTENT_STYLE.setBorderBottom(BorderStyle.THIN);
-            CONTENT_STYLE.setBorderLeft(BorderStyle.THIN);
-            CONTENT_STYLE.setBorderRight(BorderStyle.THIN);
-            CONTENT_STYLE.setVerticalAlignment(VerticalAlignment.CENTER);
-            CONTENT_STYLE.setAlignment(HorizontalAlignment.CENTER);
-        }
-
-        return CONTENT_STYLE;
+        // 内容列样式
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        return cellStyle;
     }
 }

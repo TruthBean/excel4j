@@ -14,8 +14,10 @@ public class ImportHelperTest {
 
     @Test
     public void readDataFromExcel() throws Exception {
-        File file = new File("D:\\develop\\data\\applogs\\ef7eb8ce-27f1-4580-b119-87e8d457d790.xlsx");
+        long begin = System.currentTimeMillis();
+        File file = new File("D:\\develop\\data\\applogs\\203a1072-0fac-459d-8713-4e9ea854d993.xlsx");
         List<CellEntityTest> cellEntityTests = ImportHelper.readDataFromExcel(file, CellEntityTest.class);
         System.out.println(cellEntityTests);
+        System.out.println(System.currentTimeMillis() - begin);
     }
 }

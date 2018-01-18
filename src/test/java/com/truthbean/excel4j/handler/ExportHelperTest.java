@@ -5,10 +5,14 @@ import com.truthbean.excel4j.entity.CellEntity;
 import com.truthbean.excel4j.entity.CellEntityTest;
 import com.truthbean.excel4j.entity.CellEntityValueClass;
 import com.truthbean.excel4j.entity.ExcelInfo;
+import com.truthbean.excel4j.util.ZipUtils;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author TruthBean
@@ -17,55 +21,65 @@ import java.util.*;
 public class ExportHelperTest {
 
     @Test
-    public void testThread() {
+    public void testThread() throws InterruptedException {
+        long begin = System.currentTimeMillis();
+
+        List<List<CellEntityTest>> lists = new ArrayList<>();
         for (int a = 0; a <= 100; a++) {
-            new Thread(() -> {
-
-                //ERROR: NOT WORK
-                synchronized (ExportHelperTest.class) {
-                    try {
-                        long begin = System.currentTimeMillis();
-                        List<CellEntityTest> list = new ArrayList<>();
-                        CellEntityTest test;
-                        for (int i = 0; i <= 10000; i++) {
-                            test = new CellEntityTest();
-                            test.setId(i);
-                            test.setShortNum(10000L - i);
-                            test.setTime(new Date(System.currentTimeMillis()));
-                            test.setUserName("user" + UUID.randomUUID().toString());
-                            test.setDecimal(new BigDecimal(new Random().nextDouble()));
-                            list.add(test);
-                        }
-                        System.out.println(System.currentTimeMillis() - begin);
-
-                        ExcelInfo excelInfo = ExportHelper.handleData(list, CellEntityTest.class);
-                        System.out.println(System.currentTimeMillis() - begin);
-                        System.out.println(ExportHelper.writeToFile(excelInfo, UUID.randomUUID().toString() + ".xlsx", "D:\\develop\\data\\applogs\\"));
-                        System.out.println(System.currentTimeMillis() - begin);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-            }).run();
-
+            List<CellEntityTest> list = new ArrayList<>();
+            CellEntityTest test;
+            for (int i = 0; i <= 10000; i++) {
+                test = new CellEntityTest();
+                test.setId(i);
+                test.setShortNum(10000L - i);
+                test.setTime(new Date(System.currentTimeMillis()));
+                test.setUserName("user" + UUID.randomUUID().toString());
+                test.setDecimal(new BigDecimal(new Random().nextDouble()));
+                list.add(test);
+            }
+            System.out.println(System.currentTimeMillis() - begin);
+            lists.add(list);
         }
+
+        System.out.println(System.currentTimeMillis() - begin);
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        List<String> filePaths = new ArrayList<>();
+        String distFileDir = "D:\\develop\\data\\applogs\\";
+        for (List<CellEntityTest> list : lists) {
+            executorService.execute(() -> {
+                String file = ExportHelper.toExcelFile(list, CellEntityTest.class,
+                        UUID.randomUUID().toString() + ".xls", distFileDir);
+
+                String path = distFileDir + file;
+                System.out.println(path);
+                filePaths.add(path);
+
+                System.out.println(System.currentTimeMillis() - begin);
+            });
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(60, TimeUnit.SECONDS);
+
+        ZipUtils.zip(distFileDir + UUID.randomUUID().toString() + ".zip", filePaths);
+        System.out.println(System.currentTimeMillis() - begin);
 
     }
 
     @Test
-    public void testBigData() throws Exception {
+    public void testBigData() {
         long begin = System.currentTimeMillis();
         List<CellEntityTest> list = new ArrayList<>();
         CellEntityTest test;
-        for (int i = 0; i <= 1000000; i++) {
+        for (int i = 0; i <= 100_0000; i++) {
             test = new CellEntityTest();
             test.setId(i);
             test.setShortNum((short) i);
             test.setTime(new Date(System.currentTimeMillis()));
             test.setUserName("user" + UUID.randomUUID().toString());
             test.setDecimal(new BigDecimal(new Random().nextDouble()));
+            test.setException(new RuntimeException());
             list.add(test);
         }
         System.out.println(System.currentTimeMillis() - begin);
@@ -77,7 +91,7 @@ public class ExportHelperTest {
     }
 
     @Test
-    public void handle() throws Exception {
+    public void handle() {
         List<CellEntityTest> list = new ArrayList<>();
         ExcelInfo excelInfo = ExportHelper.handleData(list, CellEntityTest.class);
         ExportHelper.writeToFile(excelInfo, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
@@ -92,9 +106,8 @@ public class ExportHelperTest {
         test.setDecimal(new BigDecimal("12345678890.01"));
         list.add(test);
 
-        CellEntityTest first = list.get(0);
         ExcelEntityHandler<CellEntityTest> entityHandler = new ExcelEntityHandler<>(CellEntityTest.class);
-        ExcelInfo excelInfo = entityHandler.handleExcelTitle(first);
+        ExcelInfo excelInfo = entityHandler.handleExcelTitle();
 
         //content
         List<List<CellEntityTest>> content = new ArrayList<>();

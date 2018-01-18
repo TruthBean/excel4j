@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -40,19 +41,24 @@ public final class ExportHelper {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportHelper.class);
 
+
+    public static synchronized <T> String toExcelFile(Collection<T> list, Class<T> cellModelClass, String fileName,
+                                                      String distFileDir) {
+        ExcelInfo excelInfo = ExportHelper.handleData(list, cellModelClass);
+        return ExportHelper.writeToFile(excelInfo, fileName, distFileDir);
+    }
+
+
     /**
      * handle data to excel
      * @param data data
      * @param tClass class
      * @param <T> T
      * @return excel info
-     * @throws Exception
-     *      throw exception when new instance
      */
-    public static synchronized <T> ExcelInfo handleData(List<T> data, Class<T> tClass) throws Exception {
-        ExcelEntityHandler<T> entityHandler = new ExcelEntityHandler<>(tClass);
-        T emptyModel = tClass.getDeclaredConstructor().newInstance();
-        ExcelInfo excelInfo = entityHandler.handleExcelTitle(emptyModel);
+    public static synchronized <T> ExcelInfo handleData(Collection<T> data, Class<T> tClass) {
+        final ExcelEntityHandler<T> entityHandler = new ExcelEntityHandler<>(tClass);
+        ExcelInfo excelInfo = entityHandler.handleExcelTitle();
         entityHandler.handleExcelContent(excelInfo, data);
         return excelInfo;
     }
@@ -123,7 +129,6 @@ public final class ExportHelper {
     }
 
     private static Workbook writeExcel(ExcelInfo excelInfo, boolean isExcel2003, int begin) {
-
         //处理excel表头
         writeExcelSheetTitle(excelInfo);
 
@@ -136,6 +141,7 @@ public final class ExportHelper {
         int contentCount = excelInfo.getContent().size();
         Row row;
         Cell cell;
+        CellStyle cellStyle = CellStyleHelper.setContentDefaultStyle(workbook);
         // 写内容
         for (int i = 0; i < contentCount; i++) {
             List<CellEntity> contents = excelInfo.getContent().get(i);
@@ -147,7 +153,7 @@ public final class ExportHelper {
                 cell = row.createCell(j);
 
                 //设置内容样式
-                cell.setCellStyle(CellStyleHelper.setContentDefaultStyle(workbook));
+                cell.setCellStyle(cellStyle);
 
                 CellEntity cellEntity = contents.get(j);
                 if (cellEntity.getValue() == null || "null".equals(cellEntity.getValue())) {
@@ -224,7 +230,7 @@ public final class ExportHelper {
         Workbook workbook = excelInfo.getWorkbook();
 
         Sheet sheet;
-        int begin = excelInfo.getBegin();
+        int begin;
 
         // 创建新HSSFWorkbook对象
         if (workbook == null) {
@@ -255,9 +261,9 @@ public final class ExportHelper {
 
             // 创建新的sheet对象
             sheet = workbook.createSheet(excelInfo.getSheetName());
-            begin = setExcelTitle(excelInfo.getBigTitle(), excelInfo.getTitles(), excelInfo.isExcel2003(), sheet, begin);
-
             excelInfo.setSheet(sheet);
+            begin = setExcelTitle(excelInfo);
+
             excelInfo.setBegin(begin);
         } else {
             sheet = workbook.getSheet(excelInfo.getSheetName());
@@ -268,29 +274,32 @@ public final class ExportHelper {
     /**
      * 设置excel标题
      *
-     * @param bigTitle    第一行标题
-     * @param titleStrs   数据标题
-     * @param isExcel2003 是否是2003格式的excel
-     * @param sheet       excel里面的sheet
-     * @param begin       开始插入excel的行数
+     * @param excelInfo
+     *  bigTitle    第一行标题
+     *  titleStrs   数据标题
+     *  sheet       excel里面的sheet
+     *  isExcel2003 是否是2003格式的excel
+     *  begin       开始插入excel的行数
      *
      * @return 最好插入excel的行数
      */
-    private static int setExcelTitle(CellEntity bigTitle, List<CellEntity> titleStrs, boolean isExcel2003,
-                                     Sheet sheet, int begin) {
-        int titleCount = titleStrs.size();
+    private static int setExcelTitle(ExcelInfo excelInfo) {
+        List<CellEntity> titleCellEntities = excelInfo.getTitles();
+        int titleCount = titleCellEntities.size();
 
         //创建第一行
         //单元格范围 参数（int firstRow, int lastRow, int firstCol, int lastCol)
         CellRangeAddress cellRangeAddress = new CellRangeAddress(0, 0, 0, titleCount - 1);
         //添加合并单元格
+        Sheet sheet = excelInfo.getSheet();
         sheet.addMergedRegion(cellRangeAddress);
 
         //创建单元格并接设置值为富文本
         Row bigTitleRow = sheet.createRow(0);
         Cell first = bigTitleRow.createCell(0);
         RichTextString str;
-        if (isExcel2003) {
+        CellEntity bigTitle = excelInfo.getBigTitle();
+        if (excelInfo.isExcel2003()) {
             str = new HSSFRichTextString((String) bigTitle.getValue());
         } else {
             str = new XSSFRichTextString((String) bigTitle.getValue());
@@ -308,17 +317,17 @@ public final class ExportHelper {
 
         // 写标题
         Cell cell;
-
+        int begin = excelInfo.getBegin();
         for (int k = 0; k < titleCount; k++) {
             // 新建一个单元格
             cell = titleRow.createCell(k);
 
             //设置标题样式
-            cell.setCellStyle(titleStrs.get(k).getCellStyle());
+            cell.setCellStyle(titleCellEntities.get(k).getCellStyle());
             cell.setCellType(CellType.STRING);
-            cell.setCellValue((String) titleStrs.get(k).getValue());
+            cell.setCellValue((String) titleCellEntities.get(k).getValue());
             //设置列宽
-            sheet.setColumnWidth(k, 10000);
+            sheet.setColumnWidth(k, titleCellEntities.get(k).getColumnWidth());
             begin = sheet.getLastRowNum() - 1;
         }
 

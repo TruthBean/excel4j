@@ -10,6 +10,7 @@ import com.truthbean.excel4j.handler.transform.text.DefaultTextTransformHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ExcelEntityHandler<T> {
     /**
      * cellModel class
      */
-    private final Class<T> cellClass;
+    private final Class<T> cellModelClass;
 
     /**
      * constructor, handle cellModel class
@@ -30,17 +31,16 @@ public class ExcelEntityHandler<T> {
      */
     public ExcelEntityHandler(Class<T> cellModelClass) {
         //excel info instance
-        cellClass = cellModelClass;
+        this.cellModelClass = cellModelClass;
     }
 
-    public ExcelInfo handleExcelTitle(T cellModel) {
+    public ExcelInfo handleExcelTitle() {
         try {
-            //excel info instance
             ExcelInfo excelInfo = new ExcelInfo();
             //sheet name
-            Sheet sheet = cellClass.getAnnotation(Sheet.class);
+            Sheet sheet = cellModelClass.getAnnotation(Sheet.class);
             if (sheet == null) {
-                throw new IllegalArgumentException(cellModel.getClass() + " without @Sheet annotation");
+                throw new IllegalArgumentException(cellModelClass.getName() + " without @Sheet annotation");
             }
             String sheetName = sheet.name();
             excelInfo.setSheetName(sheetName);
@@ -58,7 +58,7 @@ public class ExcelEntityHandler<T> {
             //title
             List<CellEntity> titles = new ArrayList<>();
 
-            Field[] fields = cellClass.getDeclaredFields();
+            Field[] fields = cellModelClass.getDeclaredFields();
 
             CellEntity title;
             Cell cell;
@@ -98,7 +98,7 @@ public class ExcelEntityHandler<T> {
             //row
             List<CellEntity> row = new ArrayList<>();
 
-            Field[] fields = cellClass.getDeclaredFields();
+            Field[] fields = cellModelClass.getDeclaredFields();
 
             Object fieldValue;
 
@@ -131,8 +131,7 @@ public class ExcelEntityHandler<T> {
                     cellEntity.setOrder(cell.order());
 
                     Class<? extends CellEntityValueHandler> valueHandlerClass = cell.transformHandler();
-                    if (cell.valueClass().equals(CellEntityValueClass.DATE)
-                            && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
+                    if (cell.valueClass().equals(CellEntityValueClass.DATE) && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
                         cellEntity.setValueHandler(new DefaultTimeTransformHandler());
                     } else {
                         cellEntity.setValueHandler(valueHandlerClass.getDeclaredConstructor().newInstance());
@@ -176,7 +175,7 @@ public class ExcelEntityHandler<T> {
         excelInfo.setBigDataContent(contentList);
     }
 
-    public void handleExcelContent(ExcelInfo excelInfo, List<T> tList) {
+    public void handleExcelContent(ExcelInfo excelInfo, Collection<T> tList) {
         List<List<CellEntity>> content = new ArrayList<>();
         for (T model : tList) {
             handleExcelRow(model, content);
