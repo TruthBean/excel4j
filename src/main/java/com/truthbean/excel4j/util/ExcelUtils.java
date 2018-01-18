@@ -34,12 +34,22 @@ public final class ExcelUtils {
     }
 
     /**
+     * 2003 excel file name regex
+     */
+    private static final String EXCEL2003_FILE_NAME_REGEX = "^.+\\.(?i)(xls)$";
+
+    /**
+     * 2007 excel file name regex
+     */
+    private static final String EXCEL2007_FILE_NAME_REGEX = "^.+\\.(?i)(xlsx)$";
+
+    /**
      * 是否是2003格式的excel
      * @param filePath 文件路径
      * @return boolean
      */
     private static boolean isExcel2003(String filePath) {
-        return filePath.matches("^.+\\.(?i)(xls)$");
+        return filePath.matches(EXCEL2003_FILE_NAME_REGEX);
     }
 
     /**
@@ -48,14 +58,19 @@ public final class ExcelUtils {
      * @return boolean
      */
     private static boolean isExcel2007(String filePath) {
-        return filePath.matches("^.+\\.(?i)(xlsx)$");
+        return filePath.matches(EXCEL2007_FILE_NAME_REGEX);
     }
 
+    /**
+     * is file 2003 excel
+     * @param filename
+     * @return
+     */
     public static boolean isExcel2003File(String filename) {
         boolean isExcel2003;
-        if (filename.matches("^.+\\.(?i)(xls)$")) {
+        if (isExcel2003(filename)) {
             isExcel2003 = true;
-        } else if (ExcelUtils.isExcel2007(filename)) {
+        } else if (isExcel2007(filename)) {
             isExcel2003 = false;
         } else {
             throw new RuntimeException("excel 文件格式错误");
@@ -222,7 +237,7 @@ public final class ExcelUtils {
             cell.setCellType(CellType.STRING);
             cell.setCellValue(titleStrs[k]);
             //设置列宽
-            sheet.setColumnWidth(k,10000);
+            sheet.setColumnWidth(k, 10000);
             begin = sheet.getLastRowNum() - 1;
         }
 

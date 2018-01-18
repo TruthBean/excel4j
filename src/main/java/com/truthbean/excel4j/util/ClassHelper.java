@@ -1,14 +1,21 @@
 package com.truthbean.excel4j.util;
 
+import com.truthbean.excel4j.common.Constants;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class ClassHelper {
+/**
+ * @author UNKOWN
+ */
+public final class ClassHelper {
+    private ClassHelper() {
+    }
 
     /**
      * Suffix for array class names: "[]"
      */
-    public static final String ARRAY_SUFFIX = "[]";
+    private static final String ARRAY_SUFFIX = "[]";
     /**
      * Prefix for internal array class names: "[L"
      */
@@ -17,30 +24,30 @@ public class ClassHelper {
      * Map with primitive type name as key and corresponding primitive type as
      * value, for example: "int" -> "int.class".
      */
-    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<String, Class<?>>(16);
+    private static final Map<String, Class<?>> PRIMITIVE_TYPE_NAME_MAP = new HashMap<>(16);
     /**
      * Map with primitive wrapper type as key and corresponding primitive type
      * as value, for example: Integer.class -> int.class.
      */
-    private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap<Class<?>, Class<?>>(8);
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPER_TYPE_MAP = new HashMap<>(8);
 
     static {
-        primitiveWrapperTypeMap.put(Boolean.class, boolean.class);
-        primitiveWrapperTypeMap.put(Byte.class, byte.class);
-        primitiveWrapperTypeMap.put(Character.class, char.class);
-        primitiveWrapperTypeMap.put(Double.class, double.class);
-        primitiveWrapperTypeMap.put(Float.class, float.class);
-        primitiveWrapperTypeMap.put(Integer.class, int.class);
-        primitiveWrapperTypeMap.put(Long.class, long.class);
-        primitiveWrapperTypeMap.put(Short.class, short.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Boolean.class, boolean.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Byte.class, byte.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Character.class, char.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Double.class, double.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Float.class, float.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Integer.class, int.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Long.class, long.class);
+        PRIMITIVE_WRAPPER_TYPE_MAP.put(Short.class, short.class);
 
         Set<Class<?>> primitiveTypeNames = new HashSet<Class<?>>(16);
-        primitiveTypeNames.addAll(primitiveWrapperTypeMap.values());
+        primitiveTypeNames.addAll(PRIMITIVE_WRAPPER_TYPE_MAP.values());
         primitiveTypeNames.addAll(Arrays
                 .asList(boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class));
         for (Iterator<Class<?>> it = primitiveTypeNames.iterator(); it.hasNext(); ) {
             Class<?> primitiveClass = it.next();
-            primitiveTypeNameMap.put(primitiveClass.getName(), primitiveClass);
+            PRIMITIVE_TYPE_NAME_MAP.put(primitiveClass.getName(), primitiveClass);
         }
     }
 
@@ -134,12 +141,12 @@ public class ClassHelper {
 
         // "[Ljava.lang.String;" style arrays
         int internalArrayMarker = name.indexOf(INTERNAL_ARRAY_PREFIX);
-        if (internalArrayMarker != -1 && name.endsWith(";")) {
+        if (internalArrayMarker != -1 && name.endsWith(Constants.COLON)) {
             String elementClassName = null;
             if (internalArrayMarker == 0) {
                 elementClassName = name
                         .substring(INTERNAL_ARRAY_PREFIX.length(), name.length() - 1);
-            } else if (name.startsWith("[")) {
+            } else if (name.startsWith(Constants.LEFT_CURLY_BRACKET)) {
                 elementClassName = name.substring(1);
             }
             Class<?> elementClass = forName(elementClassName, classLoader);
@@ -169,9 +176,9 @@ public class ClassHelper {
         Class<?> result = null;
         // Most class names will be quite long, considering that they
         // SHOULD sit in a package, so a length check is worthwhile.
-        if (name != null && name.length() <= 8) {
+        if (name != null && name.length() <= Constants.PRIMITIVE_CLASS_NUMBER) {
             // Could be a primitive - likely.
-            result = primitiveTypeNameMap.get(name);
+            result = PRIMITIVE_TYPE_NAME_MAP.get(name);
         }
         return result;
     }

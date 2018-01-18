@@ -1,6 +1,6 @@
 package com.truthbean.excel4j.handler;
 
-import com.truthbean.excel4j.annotation.Cell;
+import com.truthbean.excel4j.annotation.Column;
 import com.truthbean.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.excel4j.handler.transform.TransformFactory;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -47,9 +47,9 @@ public final class ImportHelper {
         Field[] fields = modelClass.getDeclaredFields();
         Map<Integer, Field> cellMap = new HashMap<>();
         for (Field field : fields) {
-            Cell cell = field.getAnnotation(Cell.class);
-            if (cell != null) {
-                cellMap.put(cell.order(), field);
+            Column column = field.getAnnotation(Column.class);
+            if (column != null) {
+                cellMap.put(column.order(), field);
             }
         }
 
@@ -62,7 +62,7 @@ public final class ImportHelper {
                     field.setAccessible(true);
                 }
 
-                CellEntityValueHandler handler = TransformFactory.factory(field.getType());
+                CellEntityValueHandler<Object, Object> handler = TransformFactory.factory(field.getType());
 
                 String value = row.get(i);
                 field.set(model, handler.transform(value));

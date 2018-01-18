@@ -1,5 +1,6 @@
 package com.truthbean.excel4j.handler.transform;
 
+import com.truthbean.excel4j.common.TransformConstants;
 import com.truthbean.excel4j.handler.transform.date.DefaultTimeTransformHandler;
 import com.truthbean.excel4j.handler.transform.number.*;
 import com.truthbean.excel4j.handler.transform.text.DefaultTextTransformHandler;
@@ -70,27 +71,27 @@ public final class TransformFactory {
      */
     public static CellEntityValueHandler factory(Type type) {
         String typeName = type.getTypeName();
-        if ("long".equals(typeName) || "java.lang.Long".equals(typeName)) {
+        if (TransformConstants.LONG.equals(typeName) || TransformConstants.LONG_CLASS.equals(typeName)) {
             return new LongTransformHandler();
         }
 
-        if ("short".equals(typeName) || "java.lang.Short".equals(typeName)) {
+        if (TransformConstants.SHORT.equals(typeName) || TransformConstants.SHORT_CLASS.equals(typeName)) {
             return new ShortTransformHandler();
         }
 
-        if ("int".equals(typeName) || "java.lang.Integer".equals(typeName)) {
+        if (TransformConstants.INT.equals(typeName) || TransformConstants.INTEGER.equals(typeName)) {
             return new IntegerTransformHandler();
         }
 
-        if ("double".equals(typeName) || "java.lang.Double".equals(typeName)) {
+        if (TransformConstants.DOUBLE.equals(typeName) || TransformConstants.DOUBLE_CLASS.equals(typeName)) {
             return new DoubleTransformHandler();
         }
 
-        if ("flout".equals(typeName) || "java.lang.Flout".equals(typeName)) {
+        if (TransformConstants.FLOUT.equals(typeName) || TransformConstants.FLOUT_CLASS.equals(typeName)) {
             return new FloatTransformHandler();
         }
 
-        if ("String".equals(typeName) || "java.lang.String".equals(typeName)) {
+        if (TransformConstants.STRING.equals(typeName)) {
             return new DefaultTextTransformHandler();
         }
 

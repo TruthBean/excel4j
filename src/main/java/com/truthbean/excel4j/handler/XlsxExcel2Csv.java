@@ -92,15 +92,6 @@ public class XlsxExcel2Csv {
 
             currentCol = (int) (new CellReference(cellReference)).getCol();
 
-            // Number or string?
-//            try {
-//                //noinspection ResultOfMethodCallIgnored
-//                Double.parseDouble(formattedValue);
-//                row.add(formattedValue);
-//            } catch (NumberFormatException e) {
-//                row.add(formattedValue);
-//            }
-
             row.add(formattedValue);
 
         }

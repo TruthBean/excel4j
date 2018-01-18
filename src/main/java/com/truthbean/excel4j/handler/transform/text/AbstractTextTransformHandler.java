@@ -15,6 +15,11 @@ public abstract class AbstractTextTransformHandler<T> implements CellEntityValue
         return value.toString();
     }
 
+    /**
+     * transform
+     * @param result result
+     * @return value
+     */
     @Override
     public abstract T transform(String result);
 }

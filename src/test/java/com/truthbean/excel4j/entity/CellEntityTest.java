@@ -1,6 +1,6 @@
 package com.truthbean.excel4j.entity;
 
-import com.truthbean.excel4j.annotation.Cell;
+import com.truthbean.excel4j.annotation.Column;
 import com.truthbean.excel4j.annotation.Sheet;
 
 import java.math.BigDecimal;
@@ -13,19 +13,19 @@ import java.util.Date;
 @Sheet(name = "测试SHEET", bigTitle = "测试....")
 public class CellEntityTest {
 
-    @Cell(order = 2, column = "ID", valueClass = CellEntityValueClass.DOUBLE, columnWidth = 2864)
+    @Column(order = 2, column = "ID", valueClass = CellEntityValueClass.DOUBLE, columnWidth = 2864)
     private int id;
 
-    @Cell(order = 1, column = "ShortNum", valueClass = CellEntityValueClass.DOUBLE)
+    @Column(order = 1, column = "ShortNum", valueClass = CellEntityValueClass.DOUBLE)
     private long shortNum;
 
-    @Cell(order = 3, column = "用户名", valueClass = CellEntityValueClass.TEXT, columnWidth = 9000)
+    @Column(order = 3, column = "用户名", valueClass = CellEntityValueClass.TEXT, columnWidth = 9000)
     private String userName;
 
-    @Cell(order = 5, column = "时间", valueClass = CellEntityValueClass.DATE)
+    @Column(order = 5, column = "时间", valueClass = CellEntityValueClass.DATE)
     private Date time;
 
-    @Cell(order = 4, column = "金额", valueClass = CellEntityValueClass.DOUBLE)
+    @Column(order = 4, column = "金额", valueClass = CellEntityValueClass.DOUBLE)
     private BigDecimal decimal;
 
     private Exception exception;

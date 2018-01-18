@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Cell {
+public @interface Column {
 
     int order() default 1;
 

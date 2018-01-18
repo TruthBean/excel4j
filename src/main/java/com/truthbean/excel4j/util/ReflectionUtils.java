@@ -68,7 +68,6 @@ public class ReflectionUtils {
 
         for (Class<?> superClass = object.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
-                //superClass.getMethod(methodName, parameterTypes);
                 return superClass.getDeclaredMethod(methodName, parameterTypes);
             } catch (NoSuchMethodException e) {
                 //Method 不在当前类, 继续向上转型

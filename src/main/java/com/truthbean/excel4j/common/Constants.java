@@ -85,4 +85,16 @@ public final class Constants {
      * 2.0
      */
     public static final String VERSION_2_0 = "2.0";
+
+    /**
+     * ;
+     */
+    public static final String COLON = ";";
+
+    /**
+     * [
+     */
+    public static final String LEFT_CURLY_BRACKET = "[";
+
+    public static final int PRIMITIVE_CLASS_NUMBER = 8;
 }

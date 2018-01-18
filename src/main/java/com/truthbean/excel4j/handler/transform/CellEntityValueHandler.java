@@ -8,15 +8,15 @@ public interface CellEntityValueHandler<O, R> {
 
     /**
      * format to excel cell
-     * @param value
-     * @return
+     * @param value value
+     * @return result
      */
     R format(O value);
 
     /**
      * transform excel cell to bean
-     * @param result
-     * @return
+     * @param result result
+     * @return value
      */
     O transform(R result);
 }

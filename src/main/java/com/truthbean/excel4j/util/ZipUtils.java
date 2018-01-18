@@ -6,7 +6,12 @@ import java.io.*;
 import java.util.List;
 import java.util.zip.*;
 
-public class ZipUtils {
+/**
+ * @author TruthBean
+ */
+public final class ZipUtils {
+    private ZipUtils() {
+    }
 
     /**
      * 压缩目录，注意，中文乱码，目录中不能有嵌套的目录,将不会被压缩到压缩文件中

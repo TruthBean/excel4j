@@ -61,10 +61,10 @@ public class ExcelEntityHandler<T> {
             Field[] fields = cellModelClass.getDeclaredFields();
 
             CellEntity title;
-            Cell cell;
+            Column column;
             for (Field field : fields) {
-                cell = field.getAnnotation(Cell.class);
-                if (cell == null) {
+                column = field.getAnnotation(Column.class);
+                if (column == null) {
                     continue;
                 }
 
@@ -73,10 +73,10 @@ public class ExcelEntityHandler<T> {
                 }
 
                 title = new CellEntity();
-                title.setValue(cell.column());
+                title.setValue(column.column());
                 title.setValueClass(CellEntityValueClass.TEXT);
-                title.setOrder(cell.order());
-                title.setColumnWidth(cell.columnWidth());
+                title.setOrder(column.order());
+                title.setColumnWidth(column.columnWidth());
 
                 titles.add(title);
             }
@@ -103,13 +103,13 @@ public class ExcelEntityHandler<T> {
             Object fieldValue;
 
             CellEntity cellEntity;
-            Cell cell;
+            Column column;
 
             int counter = 0;
 
             for (Field field : fields) {
-                cell = field.getAnnotation(Cell.class);
-                if (cell == null) {
+                column = field.getAnnotation(Column.class);
+                if (column == null) {
                     continue;
                 }
 
@@ -123,15 +123,15 @@ public class ExcelEntityHandler<T> {
                     cellEntity.setValue(null);
                     cellEntity.setValueClass(CellEntityValueClass.TEXT);
                     cellEntity.setValueHandler(new DefaultTextTransformHandler());
-                    cellEntity.setOrder(cell.order());
+                    cellEntity.setOrder(column.order());
                     counter++;
                 } else {
                     cellEntity.setValue(fieldValue);
-                    cellEntity.setValueClass(cell.valueClass());
-                    cellEntity.setOrder(cell.order());
+                    cellEntity.setValueClass(column.valueClass());
+                    cellEntity.setOrder(column.order());
 
-                    Class<? extends CellEntityValueHandler> valueHandlerClass = cell.transformHandler();
-                    if (cell.valueClass().equals(CellEntityValueClass.DATE) && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
+                    Class<? extends CellEntityValueHandler> valueHandlerClass = column.transformHandler();
+                    if (column.valueClass().equals(CellEntityValueClass.DATE) && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
                         cellEntity.setValueHandler(new DefaultTimeTransformHandler());
                     } else {
                         cellEntity.setValueHandler(valueHandlerClass.getDeclaredConstructor().newInstance());
