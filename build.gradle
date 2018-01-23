@@ -1,4 +1,4 @@
-group = 'com.truthbean'
+group = 'com.truthbean.code'
 version = '0.0.2'
 
 // Apply the java plugin to add support for Java
