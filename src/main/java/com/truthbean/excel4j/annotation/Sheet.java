@@ -12,5 +12,7 @@ import java.lang.annotation.*;
 public @interface Sheet {
     String name() default "Sheet1";
 
+    boolean noBigTitle() default false;
+
     String bigTitle() default "";
 }

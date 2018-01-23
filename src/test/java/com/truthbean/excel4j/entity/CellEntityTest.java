@@ -1,6 +1,7 @@
 package com.truthbean.excel4j.entity;
 
 import com.truthbean.excel4j.annotation.Column;
+import com.truthbean.excel4j.annotation.ColumnValue;
 import com.truthbean.excel4j.annotation.Sheet;
 
 import java.math.BigDecimal;
@@ -10,22 +11,24 @@ import java.util.Date;
  * @author TruthBean
  * @since 2018-01-14 20:13
  */
-@Sheet(name = "测试SHEET", bigTitle = "测试....")
+@Sheet(name = "测试SHEET", bigTitle = "hello excel4j")
 public class CellEntityTest {
 
-    @Column(order = 2, column = "ID", valueClass = CellEntityValueClass.DOUBLE, columnWidth = 2864)
+    @Column(order = 2, name = "ID", columnValue = @ColumnValue(
+            type = CellValueType.DOUBLE
+    ), width = 2864)
     private int id;
 
-    @Column(order = 1, column = "ShortNum", valueClass = CellEntityValueClass.DOUBLE)
+    @Column(name = "ShortNum", columnValue = @ColumnValue(type = CellValueType.DOUBLE))
     private long shortNum;
 
-    @Column(order = 3, column = "用户名", valueClass = CellEntityValueClass.TEXT, columnWidth = 9000)
+    @Column(order = 3, name = "用户名", width = 9000)
     private String userName;
 
-    @Column(order = 5, column = "时间", valueClass = CellEntityValueClass.DATE)
+    @Column(order = 5, name = "时间", columnValue = @ColumnValue(type = CellValueType.DATE))
     private Date time;
 
-    @Column(order = 4, column = "金额", valueClass = CellEntityValueClass.DOUBLE)
+    @Column(order = 4, name = "金额", columnValue = @ColumnValue(type = CellValueType.DOUBLE))
     private BigDecimal decimal;
 
     private Exception exception;

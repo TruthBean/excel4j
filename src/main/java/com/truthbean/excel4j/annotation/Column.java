@@ -1,9 +1,5 @@
 package com.truthbean.excel4j.annotation;
 
-import com.truthbean.excel4j.entity.CellEntityValueClass;
-import com.truthbean.excel4j.handler.transform.CellEntityValueHandler;
-import com.truthbean.excel4j.handler.transform.text.DefaultTextTransformHandler;
-
 import java.lang.annotation.*;
 
 /**
@@ -15,15 +11,33 @@ import java.lang.annotation.*;
 @Documented
 public @interface Column {
 
+    /**
+     * @return cell order in one column
+     */
     int order() default 1;
 
-    String column() default "columnName";
+    /**
+     * @return column name
+     */
+    String name() default "name";
 
+    /**
+     * @return is cell single, if merge return false
+     */
     boolean single() default true;
 
-    CellEntityValueClass valueClass() default CellEntityValueClass.TEXT;
+    /**
+     * @return cell width
+     */
+    int width() default 8000;
 
-    Class<? extends CellEntityValueHandler> transformHandler() default DefaultTextTransformHandler.class;
+    /**
+     * @return column cell value type, format and so on
+     */
+    ColumnValue columnValue() default @ColumnValue;
 
-    int columnWidth() default 8000;
+    /**
+     * @return column cell style
+     */
+    ColumnStyle[] columnStyle() default {};
 }

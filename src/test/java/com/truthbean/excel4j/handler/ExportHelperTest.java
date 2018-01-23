@@ -1,10 +1,7 @@
 package com.truthbean.excel4j.handler;
 
 import com.truthbean.excel4j.annotation.ExcelEntityHandler;
-import com.truthbean.excel4j.entity.CellEntity;
-import com.truthbean.excel4j.entity.CellEntityTest;
-import com.truthbean.excel4j.entity.CellEntityValueClass;
-import com.truthbean.excel4j.entity.ExcelInfo;
+import com.truthbean.excel4j.entity.*;
 import com.truthbean.excel4j.util.ZipUtils;
 import org.junit.Test;
 
@@ -50,7 +47,8 @@ public class ExportHelperTest {
         for (List<CellEntityTest> list : lists) {
             executorService.execute(() -> {
                 String file = ExportHelper.toExcelFile(list, CellEntityTest.class,
-                        UUID.randomUUID().toString() + ".xls", distFileDir);
+                        UUID.randomUUID().toString() + " 大标题", UUID.randomUUID().toString() + ".xls",
+                        distFileDir);
 
                 String path = distFileDir + file;
                 System.out.println(path);
@@ -84,17 +82,17 @@ public class ExportHelperTest {
         }
         System.out.println(System.currentTimeMillis() - begin);
 
-        ExcelInfo excelInfo = ExportHelper.handleData(list, CellEntityTest.class);
+        ExcelModel excelModel = ExportHelper.handleData(list, CellEntityTest.class);
         System.out.println(System.currentTimeMillis() - begin);
-        ExportHelper.writeToFile(excelInfo, UUID.randomUUID().toString() + ".xlsx", "D:\\develop\\data\\applogs\\");
+        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xlsx", "D:\\develop\\data\\applogs\\");
         System.out.println(System.currentTimeMillis() - begin);
     }
 
     @Test
     public void handle() {
         List<CellEntityTest> list = new ArrayList<>();
-        ExcelInfo excelInfo = ExportHelper.handleData(list, CellEntityTest.class);
-        ExportHelper.writeToFile(excelInfo, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
+        ExcelModel excelModel = ExportHelper.handleData(list, CellEntityTest.class);
+        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
     }
 
     @Test
@@ -107,72 +105,88 @@ public class ExportHelperTest {
         list.add(test);
 
         ExcelEntityHandler<CellEntityTest> entityHandler = new ExcelEntityHandler<>(CellEntityTest.class);
-        ExcelInfo excelInfo = entityHandler.handleExcelTitle();
+        ExcelModel excelModel = entityHandler.handleExcelTitle();
 
         //content
         List<List<CellEntityTest>> content = new ArrayList<>();
         content.add(list);
 
-        entityHandler.handleExcelBigContent(excelInfo, content);
+        entityHandler.handleExcelBigContent(excelModel, content);
 
-        ExportHelper.writeToFile(excelInfo, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
+        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
     }
 
     @Test
     public void writeToFile() {
-        ExcelInfo excelInfo = new ExcelInfo();
+        ExcelModel excelModel = new ExcelModel();
 
         //sheet name
-        excelInfo.setSheetName("sheet1");
+        excelModel.setSheetName("sheet1");
         //大标题
-        CellEntity bigTitle = new CellEntity();
+        CellModel bigTitle = new CellModel();
         bigTitle.setValue("测试大标题");
-        bigTitle.setValueClass(CellEntityValueClass.TEXT);
-        excelInfo.setBigTitle(bigTitle);
+        bigTitle.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
+        bigTitle.setStyleModel(new CellStyleModel());
+        excelModel.setBigTitle(bigTitle);
         //表头
-        List<CellEntity> titles = new ArrayList<>();
-        CellEntity title1 = new CellEntity();
-        title1.setValueClass(CellEntityValueClass.TEXT);
+        List<CellModel> titles = new ArrayList<>();
+        CellModel title1 = new CellModel();
+        title1.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
         title1.setValue("用户名");
+        title1.setOrder(1);
+        CellStyleModel title1Model = new CellStyleModel();
+        title1Model.setColumnWidth(10000);
+        title1.setStyleModel(title1Model);
         titles.add(title1);
 
-        CellEntity title2 = new CellEntity();
-        title2.setValueClass(CellEntityValueClass.TEXT);
+        CellModel title2 = new CellModel();
+        title2.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
         title2.setValue("时间");
+        title2.setOrder(2);
+        CellStyleModel title2Mode = new CellStyleModel();
+        title2Mode.setColumnWidth(10000);
+        title2.setStyleModel(title2Mode);
         titles.add(title2);
 
-        CellEntity title3 = new CellEntity();
-        title3.setValueClass(CellEntityValueClass.TEXT);
+        CellModel title3 = new CellModel();
+        title3.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
         title3.setValue("金额");
+        title3.setOrder(3);
+        CellStyleModel title3Model = new CellStyleModel();
+        title3Model.setColumnWidth(8000);
+        title3.setStyleModel(title3Model);
         titles.add(title3);
 
-        excelInfo.setTitles(titles);
+        excelModel.setTitles(titles);
 
         //内容
-        List<List<CellEntity>> content = new ArrayList<>();
-        List<CellEntity> row1 = new ArrayList<>();
-        CellEntity cell1 = new CellEntity();
-        cell1.setValueClass(CellEntityValueClass.TEXT);
+        List<List<CellModel>> content = new ArrayList<>();
+        List<CellModel> row1 = new ArrayList<>();
+        CellModel cell1 = new CellModel();
+        cell1.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
         cell1.setValue("6666666");
+        cell1.setOrder(1);
         row1.add(cell1);
 
-        CellEntity cell3 = new CellEntity();
-        cell3.setValueClass(CellEntityValueClass.DOUBLE);
+        CellModel cell3 = new CellModel();
+        cell3.setValueModel(CellValueModel.CellValueModelBuilder.buildDoubleCellValueModel());
         cell3.setValue(new BigDecimal("555555555555555555555555.55"));
+        cell3.setOrder(3);
         row1.add(cell3);
 
-        CellEntity cell2 = new CellEntity();
-        cell2.setValueClass(CellEntityValueClass.TEXT);
+        CellModel cell2 = new CellModel();
+        cell2.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
         cell2.setValue("时间");
         row1.add(title2);
+        cell2.setOrder(2);
         content.add(row1);
-        excelInfo.setContent(content);
+        excelModel.setContent(content);
 
-        excelInfo.setContent(content);
-        List<List<List<CellEntity>>> contentList = new ArrayList<>();
+        excelModel.setContent(content);
+        List<List<List<CellModel>>> contentList = new ArrayList<>();
         contentList.add(content);
-        excelInfo.setBigDataContent(contentList);
+        excelModel.setBigDataContent(contentList);
 
-        ExportHelper.writeToFile(excelInfo, "test.xls", "D:\\develop\\data\\applogs\\");
+        ExportHelper.writeToFile(excelModel, "test.xls", "D:\\develop\\data\\applogs\\");
     }
 }

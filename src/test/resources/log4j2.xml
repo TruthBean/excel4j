@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="on">
+    <Properties>
+        <Property name="LOG_HOME">logs/excel4j/</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%highlight{%d{HH:mm:ss.SSS} %-5level}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue} %class{36}.%M()/%L    %highlight{- %msg%xEx%n}{STYLE=Logback}"/>
+        </Console>
+
+        <!-- 运行日志输出文件 -->
+        <RollingRandomAccessFile name="run"
+                                 fileName="${LOG_HOME}/run.log" filePattern="${LOG_HOME}/run.%d{yyyy-MM-dd}-%i.log.gz"
+                                 append="true">
+            <!--日志格式 -->
+            <PatternLayout pattern="%d{yyyy.MM.dd HH:mm:ss z} %-5level %class{36}.%M()/%L - %msg%xEx%n" />
+            <Policies>
+                <!-- 对应 filePattern维度(根据filePattern的正则来)，此处为天数 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <!-- 文件大小单位为字节，默认不限制 -->
+                <SizeBasedTriggeringPolicy size="1073741824" />
+            </Policies>
+            <!-- 同一天的日志最大扩展个数为5，最多保存7天 -->
+            <DefaultRolloverStrategy max="5">
+                <Delete basePath="${LOG_HOME}" maxDepth="1">
+                    <IfFileName glob="run.*.log.gz" />
+                    <IfLastModified age="7d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+
+        <!-- 操作日志输出文件 -->
+        <RollingRandomAccessFile name="operation"
+                                 fileName="${LOG_HOME}/operation.log" filePattern="${LOG_HOME}/operation.%d{yyyy-MM-dd}-%i.log.gz"
+                                 append="true">
+            <PatternLayout
+                    pattern="%d{yyyy.MM.dd HH:mm:ss z} %-5level %class{36}.%M()/%L - %msg%xEx%n" />
+            <Policies>
+                <!-- 对应 filePattern维度，此处为天数 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <!-- 文件大小单位为字节，默认不限制 -->
+                <SizeBasedTriggeringPolicy size="1073741824" />
+            </Policies>
+            <!-- 同一天的日志最大扩展个数为5，最多保存7天 -->
+            <DefaultRolloverStrategy max="5">
+                <Delete basePath="${LOG_HOME}" maxDepth="1">
+                    <IfFileName glob="operation.*.log.gz" />
+                    <IfLastModified age="7d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+    <Loggers>
+
+        <Root level="DEBUG" additivity="false">
+            <appender-ref ref="Console"/>
+        </Root>
+
+    </Loggers>
+</configuration>

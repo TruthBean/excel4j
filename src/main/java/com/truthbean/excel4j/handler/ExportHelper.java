@@ -2,9 +2,7 @@ package com.truthbean.excel4j.handler;
 
 import com.truthbean.excel4j.annotation.ExcelEntityHandler;
 import com.truthbean.excel4j.common.Constants;
-import com.truthbean.excel4j.entity.CellEntity;
-import com.truthbean.excel4j.entity.CellEntityValueClass;
-import com.truthbean.excel4j.entity.ExcelInfo;
+import com.truthbean.excel4j.entity.*;
 import com.truthbean.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.excel4j.util.CellStyleHelper;
 import com.truthbean.excel4j.util.ExcelUtils;
@@ -44,8 +42,14 @@ public final class ExportHelper {
 
     public static synchronized <T> String toExcelFile(Collection<T> list, Class<T> cellModelClass, String fileName,
                                                       String distFileDir) {
-        ExcelInfo excelInfo = ExportHelper.handleData(list, cellModelClass);
-        return ExportHelper.writeToFile(excelInfo, fileName, distFileDir);
+        ExcelModel excelModel = ExportHelper.handleData(list, cellModelClass);
+        return ExportHelper.writeToFile(excelModel, fileName, distFileDir);
+    }
+
+    public static synchronized <T> String toExcelFile(Collection<T> list, Class<T> cellModelClass, String bigTitle,
+                                                      String fileName, String distFileDir) {
+        ExcelModel excelModel = ExportHelper.handleData(list, cellModelClass, bigTitle);
+        return ExportHelper.writeToFile(excelModel, fileName, distFileDir);
     }
 
 
@@ -56,26 +60,54 @@ public final class ExportHelper {
      * @param <T> T
      * @return excel info
      */
-    public static synchronized <T> ExcelInfo handleData(Collection<T> data, Class<T> tClass) {
+    public static synchronized <T> ExcelModel handleData(Collection<T> data, Class<T> tClass) {
         final ExcelEntityHandler<T> entityHandler = new ExcelEntityHandler<>(tClass);
-        ExcelInfo excelInfo = entityHandler.handleExcelTitle();
-        entityHandler.handleExcelContent(excelInfo, data);
-        return excelInfo;
+        ExcelModel excelModel = entityHandler.handleExcelTitle();
+        entityHandler.handleExcelContent(excelModel, data);
+        return excelModel;
+    }
+
+    /**
+     * handle data to excel
+     * @param data data
+     * @param tClass class
+     * @param <T> T
+     * @return excel info
+     */
+    public static synchronized <T> ExcelModel handleData(Collection<T> data, Class<T> tClass, String bigTitle) {
+        final ExcelEntityHandler<T> entityHandler = new ExcelEntityHandler<>(tClass);
+        ExcelModel excelModel = entityHandler.handleExcelTitle();
+
+        //big title
+        CellModel cellModel = new CellModel();
+        cellModel.setValue(bigTitle);
+
+        CellValueModel model = new CellValueModel();
+        model.setValueType(CellValueType.TEXT);
+        cellModel.setValueModel(model);
+
+        excelModel.setBigTitle(cellModel);
+
+        //should have big title
+        excelModel.setNoBigTitle(false);
+
+        entityHandler.handleExcelContent(excelModel, data);
+        return excelModel;
     }
 
     /**
      * 导出数据到本地excel中
      *
-     * @param excelInfo excel info
+     * @param excelModel excel info
      * @param filename    文件名
      * @param distFileDir 目标路径
      *
      * @return filePath
      */
-    public static synchronized String writeToFile(ExcelInfo excelInfo, String filename, String distFileDir) {
+    public static synchronized String writeToFile(ExcelModel excelModel, String filename, String distFileDir) {
         //是否是2003格式的excel
         boolean isExcel2003 = ExcelUtils.isExcel2003File(filename);
-        excelInfo.setExcel2003(isExcel2003);
+        excelModel.setExcel2003(isExcel2003);
 
         String filePath = distFileDir + filename;
         File file = new File(filePath);
@@ -83,11 +115,11 @@ public final class ExportHelper {
             file.delete();
         }
 
-        List<List<List<CellEntity>>> contentList = excelInfo.getBigDataContent();
+        List<List<List<CellModel>>> contentList = excelModel.getBigDataContent();
         if (contentList == null || contentList.isEmpty()) {
-            if (excelInfo.getContent() != null && !excelInfo.getContent().isEmpty()) {
+            if (excelModel.getContent() != null && !excelModel.getContent().isEmpty()) {
                 contentList = new ArrayList<>();
-                contentList.add(excelInfo.getContent());
+                contentList.add(excelModel.getContent());
             }
         }
 
@@ -100,18 +132,18 @@ public final class ExportHelper {
 
                 int i = 0;
                 do {
-                    excelInfo.setContent(contentList.get(i));
-                    workbook = writeExcel(excelInfo, isExcel2003, begin);
-                    excelInfo.setWorkbook(workbook);
+                    excelModel.setContent(contentList.get(i));
+                    workbook = writeExcel(excelModel, isExcel2003, begin);
+                    excelModel.setWorkbook(workbook);
                     i++;
                     begin += contentList.get(i - 1).size();
                 } while (i < contentListSize);
 
             } else {
                 //写一个内容为空的excel
-                excelInfo.setContent(new ArrayList<>());
-                workbook = writeExcel(excelInfo, isExcel2003, 0);
-                excelInfo.setWorkbook(workbook);
+                excelModel.setContent(new ArrayList<>());
+                workbook = writeExcel(excelModel, isExcel2003, 0);
+                excelModel.setWorkbook(workbook);
             }
 
             FileOutputStream fileOut = new FileOutputStream(file);
@@ -128,23 +160,23 @@ public final class ExportHelper {
         return filename;
     }
 
-    private static Workbook writeExcel(ExcelInfo excelInfo, boolean isExcel2003, int begin) {
+    private static Workbook writeExcel(ExcelModel excelModel, boolean isExcel2003, int begin) {
         //处理excel表头
-        writeExcelSheetTitle(excelInfo);
+        writeExcelSheetTitle(excelModel);
 
-        Sheet sheet = excelInfo.getSheet();
-        Workbook workbook = excelInfo.getWorkbook();
+        Sheet sheet = excelModel.getSheet();
+        Workbook workbook = excelModel.getWorkbook();
         //列数
-        int titleCount = excelInfo.getTitles().size();
+        int titleCount = excelModel.getTitles().size();
 
         //总的记录数
-        int contentCount = excelInfo.getContent().size();
+        int contentCount = excelModel.getContent().size();
         Row row;
         Cell cell;
         CellStyle cellStyle = CellStyleHelper.setContentDefaultStyle(workbook);
         // 写内容
         for (int i = 0; i < contentCount; i++) {
-            List<CellEntity> contents = excelInfo.getContent().get(i);
+            List<CellModel> contents = excelModel.getContent().get(i);
             // 新建一行
             row = sheet.createRow(i + 2 + begin);
 
@@ -155,11 +187,11 @@ public final class ExportHelper {
                 //设置内容样式
                 cell.setCellStyle(cellStyle);
 
-                CellEntity cellEntity = contents.get(j);
-                if (cellEntity.getValue() == null || "null".equals(cellEntity.getValue())) {
-                    cellEntity.setValue("");
+                CellModel cellModel = contents.get(j);
+                if (cellModel.getValue() == null || "null".equals(cellModel.getValue())) {
+                    cellModel.setValue("");
                 }
-                handleValue(cellEntity, isExcel2003, cell);
+                handleValue(cellModel, isExcel2003, cell);
             }
         }
         return workbook;
@@ -185,10 +217,12 @@ public final class ExportHelper {
         }
     }
 
-    private static void handleValue(CellEntity cellEntity, boolean isExcel2003, Cell cell) {
-        Object value = cellEntity.getValue();
-        CellEntityValueClass valueClass = cellEntity.getValueClass();
-        CellEntityValueHandler valueHandler = cellEntity.getValueHandler();
+    private static void handleValue(CellModel cellModel, boolean isExcel2003, Cell cell) {
+        Object value = cellModel.getValue();
+        CellValueModel valueModel = cellModel.getValueModel();
+
+        CellValueType valueClass = valueModel.getValueType();
+        CellEntityValueHandler valueHandler = valueModel.getValueHandler();
         if (isExcel2003) {
             switch (valueClass) {
                 case DOUBLE:
@@ -224,20 +258,20 @@ public final class ExportHelper {
 
     /**
      * 处理excel表头
-     * @param excelInfo excel info
+     * @param excelModel excel info
      */
-    private static void writeExcelSheetTitle(ExcelInfo excelInfo) {
-        Workbook workbook = excelInfo.getWorkbook();
+    private static void writeExcelSheetTitle(ExcelModel excelModel) {
+        Workbook workbook = excelModel.getWorkbook();
 
         Sheet sheet;
         int begin;
 
         // 创建新HSSFWorkbook对象
         if (workbook == null) {
-            if (excelInfo.isExcel2003()) {
+            if (excelModel.isExcel2003()) {
                 workbook = new HSSFWorkbook();
                 //EXCEL2003格式最大行数是65535
-                if (excelInfo.getContent().size() >= Constants.EXCEL2003_MAX_ROW) {
+                if (excelModel.getContent().size() >= Constants.EXCEL2003_MAX_ROW) {
                     throw new IllegalStateException();
                 }
             } else {
@@ -245,36 +279,54 @@ public final class ExportHelper {
             }
 
             //workbook
-            excelInfo.setWorkbook(workbook);
+            excelModel.setWorkbook(workbook);
 
             //设置样式
             //大标题样式
             CellStyle bigTitleStyle = CellStyleHelper.setBigTitleDefaultStyle(workbook);
-            CellEntity bigTitle = excelInfo.getBigTitle();
-            bigTitle.setCellStyle(bigTitleStyle);
+            CellModel bigTitle = excelModel.getBigTitle();
+
+            if (!excelModel.isNoBigTitle()) {
+                CellStyleModel bigTitleStyleModel = bigTitle.getStyleModel();
+                //if style is null, do this
+                if (bigTitleStyleModel == null) {
+                    bigTitleStyleModel = new CellStyleModel();
+                }
+
+                bigTitleStyleModel.setCellStyle(bigTitleStyle);
+                bigTitle.setStyleModel(bigTitleStyleModel);
+            }
 
             //标题样式
             CellStyle titleStyle = CellStyleHelper.setTitleDefaultStyle(workbook);
-            for (CellEntity title : excelInfo.getTitles()) {
-                title.setCellStyle(titleStyle);
+            CellStyleModel styleModel;
+            for (CellModel title : excelModel.getTitles()) {
+                styleModel = title.getStyleModel();
+                //if style is null, do this
+                if (styleModel == null) {
+                    styleModel = new CellStyleModel();
+                }
+
+                styleModel.setCellStyle(titleStyle);
+                title.setStyleModel(styleModel);
             }
 
             // 创建新的sheet对象
-            sheet = workbook.createSheet(excelInfo.getSheetName());
-            excelInfo.setSheet(sheet);
-            begin = setExcelTitle(excelInfo);
+            sheet = workbook.createSheet(excelModel.getSheetName());
+            excelModel.setSheet(sheet);
+            begin = setExcelTitle(excelModel);
 
-            excelInfo.setBegin(begin);
+            excelModel.setBegin(begin);
         } else {
-            sheet = workbook.getSheet(excelInfo.getSheetName());
-            excelInfo.setSheet(sheet);
+            sheet = workbook.getSheet(excelModel.getSheetName());
+            excelModel.setSheet(sheet);
         }
     }
 
     /**
      * 设置excel标题
      *
-     * @param excelInfo
+     * @param excelModel
      *  bigTitle    第一行标题
      *  titleStrs   数据标题
      *  sheet       excel里面的sheet
@@ -283,52 +335,64 @@ public final class ExportHelper {
      *
      * @return 最好插入excel的行数
      */
-    private static int setExcelTitle(ExcelInfo excelInfo) {
-        List<CellEntity> titleCellEntities = excelInfo.getTitles();
+    private static int setExcelTitle(ExcelModel excelModel) {
+        List<CellModel> titleCellEntities = excelModel.getTitles();
         int titleCount = titleCellEntities.size();
 
-        //创建第一行
-        //单元格范围 参数（int firstRow, int lastRow, int firstCol, int lastCol)
-        CellRangeAddress cellRangeAddress = new CellRangeAddress(0, 0, 0, titleCount - 1);
-        //添加合并单元格
-        Sheet sheet = excelInfo.getSheet();
-        sheet.addMergedRegion(cellRangeAddress);
+        Sheet sheet = excelModel.getSheet();
 
-        //创建单元格并接设置值为富文本
-        Row bigTitleRow = sheet.createRow(0);
-        Cell first = bigTitleRow.createCell(0);
-        RichTextString str;
-        CellEntity bigTitle = excelInfo.getBigTitle();
-        if (excelInfo.isExcel2003()) {
-            str = new HSSFRichTextString((String) bigTitle.getValue());
-        } else {
-            str = new XSSFRichTextString((String) bigTitle.getValue());
+        //创建第一行
+        if (!excelModel.isNoBigTitle()) {
+            //单元格范围 参数（int firstRow, int lastRow, int firstCol, int lastCol)
+            CellRangeAddress cellRangeAddress = new CellRangeAddress(0, 0, 0, titleCount - 1);
+            //添加合并单元格
+            sheet.addMergedRegion(cellRangeAddress);
+
+            //创建单元格并接设置值为富文本
+            Row bigTitleRow = sheet.createRow(0);
+            Cell first = bigTitleRow.createCell(0);
+            RichTextString str;
+            CellModel bigTitle = excelModel.getBigTitle();
+            CellStyleModel styleModel = bigTitle.getStyleModel();
+
+            if (excelModel.isExcel2003()) {
+                str = new HSSFRichTextString((String) bigTitle.getValue());
+            } else {
+                str = new XSSFRichTextString((String) bigTitle.getValue());
+            }
+
+            first.setCellValue(str);
+            first.setCellStyle(styleModel.getCellStyle());
+            bigTitleRow.setHeightInPoints(22);
         }
 
-        first.setCellValue(str);
-        first.setCellStyle(bigTitle.getCellStyle());
-        bigTitleRow.setHeightInPoints(22);
-
         //第二行，标题行
-        Row titleRow = sheet.createRow(1);
+        int titleRowNum = excelModel.isNoBigTitle() ? 0 : 1;
+        Row titleRow = sheet.createRow(titleRowNum);
 
         //20像素
         titleRow.setHeightInPoints(20);
 
         // 写标题
         Cell cell;
-        int begin = excelInfo.getBegin();
+        int begin = excelModel.getBegin();
+
+        CellModel cellModel;
+        CellStyleModel styleModel;
+
         for (int k = 0; k < titleCount; k++) {
             // 新建一个单元格
             cell = titleRow.createCell(k);
+            cellModel = titleCellEntities.get(k);
+            styleModel = cellModel.getStyleModel();
 
             //设置标题样式
-            cell.setCellStyle(titleCellEntities.get(k).getCellStyle());
+            cell.setCellStyle(styleModel.getCellStyle());
             cell.setCellType(CellType.STRING);
             cell.setCellValue((String) titleCellEntities.get(k).getValue());
             //设置列宽
-            sheet.setColumnWidth(k, titleCellEntities.get(k).getColumnWidth());
-            begin = sheet.getLastRowNum() - 1;
+            sheet.setColumnWidth(k, styleModel.getColumnWidth());
+            begin = sheet.getLastRowNum() - titleRowNum;
         }
 
         //冻结第一、二行

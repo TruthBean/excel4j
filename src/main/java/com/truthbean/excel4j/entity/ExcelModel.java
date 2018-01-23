@@ -9,7 +9,7 @@ import java.util.List;
  * @author TruthBean
  * @since 2018-01-14 20:32
  */
-public class ExcelInfo {
+public class ExcelModel {
     /**
      * workbook
      */
@@ -23,22 +23,27 @@ public class ExcelInfo {
     /**
      * excel big title, locate in first row
      */
-    private CellEntity bigTitle;
+    private CellModel bigTitle;
+
+    /**
+     * excel no big title
+     */
+    private boolean noBigTitle;
 
     /**
      * excel title
      */
-    private List<CellEntity> titles;
+    private List<CellModel> titles;
 
     /**
      * excel content
      */
-    private List<List<CellEntity>> content;
+    private List<List<CellModel>> content;
 
     /**
      * if content data is big, use it
      */
-    private List<List<List<CellEntity>>> bigDataContent;
+    private List<List<List<CellModel>>> bigDataContent;
 
     /**
      * is excel 2003
@@ -71,27 +76,27 @@ public class ExcelInfo {
         this.sheetName = sheetName;
     }
 
-    public CellEntity getBigTitle() {
+    public CellModel getBigTitle() {
         return bigTitle;
     }
 
-    public void setBigTitle(CellEntity bigTitle) {
+    public void setBigTitle(CellModel bigTitle) {
         this.bigTitle = bigTitle;
     }
 
-    public List<CellEntity> getTitles() {
+    public List<CellModel> getTitles() {
         return titles;
     }
 
-    public void setTitles(List<CellEntity> titles) {
+    public void setTitles(List<CellModel> titles) {
         this.titles = titles;
     }
 
-    public List<List<CellEntity>> getContent() {
+    public List<List<CellModel>> getContent() {
         return content;
     }
 
-    public void setContent(List<List<CellEntity>> content) {
+    public void setContent(List<List<CellModel>> content) {
         this.content = content;
     }
 
@@ -119,11 +124,19 @@ public class ExcelInfo {
         this.begin = begin;
     }
 
-    public List<List<List<CellEntity>>> getBigDataContent() {
+    public List<List<List<CellModel>>> getBigDataContent() {
         return bigDataContent;
     }
 
-    public void setBigDataContent(List<List<List<CellEntity>>> bigDataContent) {
+    public void setBigDataContent(List<List<List<CellModel>>> bigDataContent) {
         this.bigDataContent = bigDataContent;
+    }
+
+    public boolean isNoBigTitle() {
+        return noBigTitle;
+    }
+
+    public void setNoBigTitle(boolean noBigTitle) {
+        this.noBigTitle = noBigTitle;
     }
 }

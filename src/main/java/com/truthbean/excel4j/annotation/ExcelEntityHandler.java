@@ -1,8 +1,6 @@
 package com.truthbean.excel4j.annotation;
 
-import com.truthbean.excel4j.entity.CellEntity;
-import com.truthbean.excel4j.entity.CellEntityValueClass;
-import com.truthbean.excel4j.entity.ExcelInfo;
+import com.truthbean.excel4j.entity.*;
 import com.truthbean.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.excel4j.handler.transform.date.DefaultTimeTransformHandler;
 import com.truthbean.excel4j.handler.transform.text.DefaultTextTransformHandler;
@@ -34,33 +32,44 @@ public class ExcelEntityHandler<T> {
         this.cellModelClass = cellModelClass;
     }
 
-    public ExcelInfo handleExcelTitle() {
+    /**
+     * handle excel title
+     * @return ExcelModel
+     */
+    public ExcelModel handleExcelTitle() {
         try {
-            ExcelInfo excelInfo = new ExcelInfo();
+            ExcelModel excelModel = new ExcelModel();
             //sheet name
             Sheet sheet = cellModelClass.getAnnotation(Sheet.class);
             if (sheet == null) {
                 throw new IllegalArgumentException(cellModelClass.getName() + " without @Sheet annotation");
             }
             String sheetName = sheet.name();
-            excelInfo.setSheetName(sheetName);
+            excelModel.setSheetName(sheetName);
 
             //big title
-            String bigTitleValue = sheet.bigTitle();
-            if (!"".equals(bigTitleValue)) {
-                CellEntity bigTitle = new CellEntity();
+            boolean noBigTitle = sheet.noBigTitle();
+            excelModel.setNoBigTitle(noBigTitle);
+            if (!noBigTitle) {
+                CellModel bigTitle = new CellModel();
                 bigTitle.setValue(sheet.bigTitle());
-                bigTitle.setValueClass(CellEntityValueClass.TEXT);
 
-                excelInfo.setBigTitle(bigTitle);
+                CellValueModel model = new CellValueModel();
+                model.setValueType(CellValueType.TEXT);
+                bigTitle.setValueModel(model);
+
+                CellStyleModel styleModel = new CellStyleModel();
+                bigTitle.setStyleModel(styleModel);
+
+                excelModel.setBigTitle(bigTitle);
             }
 
             //title
-            List<CellEntity> titles = new ArrayList<>();
+            List<CellModel> titles = new ArrayList<>();
 
             Field[] fields = cellModelClass.getDeclaredFields();
 
-            CellEntity title;
+            CellModel title;
             Column column;
             for (Field field : fields) {
                 column = field.getAnnotation(Column.class);
@@ -72,20 +81,26 @@ public class ExcelEntityHandler<T> {
                     field.setAccessible(true);
                 }
 
-                title = new CellEntity();
-                title.setValue(column.column());
-                title.setValueClass(CellEntityValueClass.TEXT);
+                title = new CellModel();
+                title.setValue(column.name());
+
+                CellValueModel model = new CellValueModel();
+                model.setValueType(CellValueType.TEXT);
+                title.setValueModel(model);
+
                 title.setOrder(column.order());
-                title.setColumnWidth(column.columnWidth());
+                CellStyleModel styleModel = new CellStyleModel();
+                styleModel.setColumnWidth(column.width());
+                title.setStyleModel(styleModel);
 
                 titles.add(title);
             }
 
             //sort by order
-            titles.sort(Comparator.comparingInt(CellEntity::getOrder));
-            excelInfo.setTitles(titles);
+            titles.sort(Comparator.comparingInt(CellModel::getOrder));
+            excelModel.setTitles(titles);
 
-            return excelInfo;
+            return excelModel;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,16 +108,21 @@ public class ExcelEntityHandler<T> {
         return null;
     }
 
-    public void handleExcelRow(T cellModel, List<List<CellEntity>> content) {
+    /**
+     * handle each excel row
+     * @param cellModel cell model
+     * @param content content
+     */
+    public void handleExcelRow(T cellModel, List<List<CellModel>> content) {
         try {
             //row
-            List<CellEntity> row = new ArrayList<>();
+            List<CellModel> row = new ArrayList<>();
 
             Field[] fields = cellModelClass.getDeclaredFields();
 
             Object fieldValue;
 
-            CellEntity cellEntity;
+            CellModel cellEntity;
             Column column;
 
             int counter = 0;
@@ -118,31 +138,44 @@ public class ExcelEntityHandler<T> {
                 }
                 fieldValue = field.get(cellModel);
 
-                cellEntity = new CellEntity();
+                cellEntity = new CellModel();
                 if (fieldValue == null) {
                     cellEntity.setValue(null);
-                    cellEntity.setValueClass(CellEntityValueClass.TEXT);
-                    cellEntity.setValueHandler(new DefaultTextTransformHandler());
+
+                    CellValueModel model = new CellValueModel();
+                    model.setValueType(CellValueType.TEXT);
+                    model.setValueHandler(new DefaultTextTransformHandler());
+                    cellEntity.setValueModel(model);
+
                     cellEntity.setOrder(column.order());
                     counter++;
                 } else {
                     cellEntity.setValue(fieldValue);
-                    cellEntity.setValueClass(column.valueClass());
+
+                    //type
+                    CellValueType type = column.columnValue().type();
+
+                    CellValueModel model = new CellValueModel();
+                    model.setValueType(type);
+                    model.setValueHandler(new DefaultTextTransformHandler());
+
                     cellEntity.setOrder(column.order());
 
-                    Class<? extends CellEntityValueHandler> valueHandlerClass = column.transformHandler();
-                    if (column.valueClass().equals(CellEntityValueClass.DATE) && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
-                        cellEntity.setValueHandler(new DefaultTimeTransformHandler());
+                    Class<? extends CellEntityValueHandler> valueHandlerClass = column.columnValue().transformHandler();
+                    if (type.equals(CellValueType.DATE) && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
+                        model.setValueHandler(new DefaultTimeTransformHandler());
                     } else {
-                        cellEntity.setValueHandler(valueHandlerClass.getDeclaredConstructor().newInstance());
+                        model.setValueHandler(valueHandlerClass.getDeclaredConstructor().newInstance());
                     }
+
+                    cellEntity.setValueModel(model);
                 }
 
                 row.add(cellEntity);
             }
 
             //sort by order
-            row.sort(Comparator.comparingInt(CellEntity::getOrder));
+            row.sort(Comparator.comparingInt(CellModel::getOrder));
 
             //此行应该为空
             if (counter != fields.length) {
@@ -155,10 +188,10 @@ public class ExcelEntityHandler<T> {
 
     }
 
-    public void handleExcelBigContent(ExcelInfo excelInfo, List<List<T>> lists) {
-        List<List<List<CellEntity>>> contentList = new ArrayList<>();
+    public void handleExcelBigContent(ExcelModel excelModel, List<List<T>> lists) {
+        List<List<List<CellModel>>> contentList = new ArrayList<>();
 
-        List<List<CellEntity>> content;
+        List<List<CellModel>> content;
 
         for (List<T> tList : lists) {
             content = new ArrayList<>();
@@ -169,18 +202,18 @@ public class ExcelEntityHandler<T> {
         }
 
         if (contentList.size() == 1) {
-            excelInfo.setContent(contentList.get(0));
+            excelModel.setContent(contentList.get(0));
         }
 
-        excelInfo.setBigDataContent(contentList);
+        excelModel.setBigDataContent(contentList);
     }
 
-    public void handleExcelContent(ExcelInfo excelInfo, Collection<T> tList) {
-        List<List<CellEntity>> content = new ArrayList<>();
+    public void handleExcelContent(ExcelModel excelModel, Collection<T> tList) {
+        List<List<CellModel>> content = new ArrayList<>();
         for (T model : tList) {
             handleExcelRow(model, content);
         }
-        excelInfo.setContent(content);
+        excelModel.setContent(content);
     }
 
 }
