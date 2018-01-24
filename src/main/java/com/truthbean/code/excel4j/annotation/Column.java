@@ -4,12 +4,17 @@ import java.lang.annotation.*;
 
 /**
  * @author TruthBean
- * @since 2018-01-14 20:05
+ * @since 0.0.1
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Column {
+
+    /**
+     * default width
+     */
+    int WIDTH = 8000;
 
     /**
      * @return cell order in one column
@@ -29,7 +34,7 @@ public @interface Column {
     /**
      * @return cell width
      */
-    int width() default 8000;
+    int width() default WIDTH;
 
     /**
      * @return column cell value type, format and so on

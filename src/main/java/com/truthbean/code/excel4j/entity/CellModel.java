@@ -2,7 +2,7 @@ package com.truthbean.code.excel4j.entity;
 
 /**
  * @author TruthBean
- * @since 2018-01-14 20:09
+ * @since 0.0.1
  */
 public class CellModel {
 

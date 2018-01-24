@@ -2,7 +2,7 @@ package com.truthbean.code.excel4j.handler.transform.text;
 
 /**
  * @author TruthBean
- * @since 2018-01-15 17:28
+ * @since 0.0.1
  */
 public class DefaultTextTransformHandler extends AbstractTextTransformHandler<String> {
 

@@ -48,6 +48,8 @@ import java.util.List;
  * your own!
  *
  * @author apache
+ * @author TruthBean
+ * @since 0.0.1
  */
 public class XlsxExcel2Csv {
     /**
@@ -161,7 +163,6 @@ public class XlsxExcel2Csv {
         XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
         if (iter.hasNext()) {
             try (InputStream stream = iter.next()) {
-                System.out.println(1);
                 processSheet(styles, strings, new SheetToCsv(), stream);
             }
         }

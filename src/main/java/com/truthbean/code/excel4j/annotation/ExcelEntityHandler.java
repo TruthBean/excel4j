@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * @author TruthBean
- * @since 2018-01-15 14:24
+ * @since 0.0.1
  */
 public class ExcelEntityHandler<T> {
 
@@ -162,7 +162,8 @@ public class ExcelEntityHandler<T> {
                     cellEntity.setOrder(column.order());
 
                     Class<? extends CellEntityValueHandler> valueHandlerClass = column.columnValue().transformHandler();
-                    if (type.equals(CellValueType.DATE) && valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
+                    if (type.equals(CellValueType.DATE) &&
+                            valueHandlerClass.equals(DefaultTextTransformHandler.class)) {
                         model.setValueHandler(new DefaultTimeTransformHandler());
                     } else {
                         model.setValueHandler(valueHandlerClass.getDeclaredConstructor().newInstance());

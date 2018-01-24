@@ -4,7 +4,7 @@ import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 
 /**
  * @author TruthBean
- * @since 2018-01-16 19:23
+ * @since 0.0.1
  */
 public class LongTransformHandler implements CellEntityValueHandler<Long, String> {
     @Override

@@ -1,11 +1,82 @@
 # excel4j
 
+### desc
+
+This project use gradle build, you can learn from 
+[https://docs.gradle.org/4.4.1/userguide/userguide.html](https://docs.gradle.org/4.4.1/userguide/userguide.html).
+
+Apache poi is used too, and jxl may used if someone asked, but now is not yet
+
+And kotlin lang should be used too, i like it, you can learn from
+[http://kotlinlang.org/docs/reference/](http://kotlinlang.org/docs/reference/).
+
+And ...
+
+### example
+
+Using annotation
+
+```java
+@Sheet(name = "测试SHEET", bigTitle = "hello excel4j")
+public class CellEntityTest {
+
+    @Column(order = 2, name = "ID", columnValue = @ColumnValue(
+            type = CellValueType.DOUBLE
+    ), width = 2864)
+    private int id;
+
+    @Column(name = "ShortNum", columnValue = @ColumnValue(type = CellValueType.DOUBLE))
+    private long shortNum;
+
+    @Column(order = 3, name = "用户名", width = 9000)
+    private String userName;
+
+    @Column(order = 5, name = "时间", columnValue = @ColumnValue(type = CellValueType.DATE))
+    private Date time;
+
+    @Column(order = 4, name = "金额", columnValue = @ColumnValue(type = CellValueType.DOUBLE))
+    private BigDecimal decimal;
+
+    private Exception exception;
+    
+    ...
+}
+```
+
 #### java bean export into excel
+ 
+ eg.
+ 
+ ```java
+    ExcelModel excelModel = ExportHelper.handleData(list, CellEntityTest.class);
+    ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xlsx", "D:\\develop\\data\\applogs\\");
+```
+ more example, please see test class ExportHelperTest.java
+ 
+ ---
+ 
+ #### excel to java bean
+ 
+ eg.
+ ```java
+    File file = new File("D:\\develop\\data\\applogs\\203a1072-0fac-459d-8713-4e9ea854d993.xlsx");
+    List<CellEntityTest> cellEntityTests = ImportHelper.readDataFromExcel(file, CellEntityTest.class);
+```
+ please see test class ImportHelperTest.java
+ 
+ ---
+ 
+ ### custom
+ 
+ you can custom transform handler, implement CellEntityValueHandler or extend other handler class.
+ And then you just do this:
+ ```java
+    @Column(order = 2, name = "ID", columnValue = @ColumnValue(
+            type = CellValueType.DOUBLE, transformHandler = CustomDoubleTransformHandler.class
+    ), width = 2864)
+    private int id;
+```
+this transformHandler is your CustomDoubleTransformHandler
 
-see test class ExportHelperTest.java
-
----
-
-#### excel to java bean
-
-see test class ImportHelperTest.java
+### attache
+this project is just started, I am glad to see you join。

@@ -1,17 +1,11 @@
-/*
- * Copyright (C) 2015 truth
- *
- * This program is non-free software, but you can redistribute it and/or modify
- * it if you are in org.hejianjiao(Huangshi Hejianjiao) team.
- */
 package com.truthbean.code.excel4j.util;
 
 import java.lang.reflect.*;
 
 /**
- * 反射�? Utils 函数集合 提供访问私有变量, 获取泛型类型 Class, 提取集合中元素属性等 Utils 函数
- * @since Jan 15, 2015 11:21:31 AM
+ * 反射Utils 函数集合 提供访问私有变量, 获取泛型类型 Class, 提取集合中元素属性等 Utils 函数
  * @author TruthBean
+ * @since 0.0.1
  */
 public class ReflectionUtils {
 

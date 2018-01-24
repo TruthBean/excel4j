@@ -7,6 +7,7 @@ import java.util.*;
 
 /**
  * @author UNKOWN
+ * @since 0.0.1
  */
 public final class ClassHelper {
     private ClassHelper() {
@@ -44,13 +45,19 @@ public final class ClassHelper {
         Set<Class<?>> primitiveTypeNames = new HashSet<Class<?>>(16);
         primitiveTypeNames.addAll(PRIMITIVE_WRAPPER_TYPE_MAP.values());
         primitiveTypeNames.addAll(Arrays
-                .asList(boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class));
-        for (Iterator<Class<?>> it = primitiveTypeNames.iterator(); it.hasNext(); ) {
-            Class<?> primitiveClass = it.next();
+                .asList(boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class,
+                        long[].class, short[].class));
+        for (Class<?> primitiveClass : primitiveTypeNames) {
             PRIMITIVE_TYPE_NAME_MAP.put(primitiveClass.getName(), primitiveClass);
         }
     }
 
+    /**
+     * forName by current thread class loader
+     * @param name class name
+     * @return class
+     * @throws ClassNotFoundException if the class not found
+     */
     public static Class<?> forNameWithThreadContextClassLoader(String name)
             throws ClassNotFoundException {
         return forName(name, Thread.currentThread().getContextClassLoader());

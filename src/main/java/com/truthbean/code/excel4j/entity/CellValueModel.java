@@ -6,7 +6,7 @@ import com.truthbean.code.excel4j.handler.transform.text.DefaultTextTransformHan
 
 /**
  * @author TruthBean
- * @since 2018-01-20 18:23
+ * @since 0.0.1
  */
 public class CellValueModel {
     /**
@@ -36,6 +36,10 @@ public class CellValueModel {
     }
 
     public static class CellValueModelBuilder {
+        /**
+         * build text cell value
+         * @return CellValueModel
+         */
         public static CellValueModel buildTextCellValueModel() {
             CellValueModel model = new CellValueModel();
             model.setValueType(CellValueType.TEXT);
@@ -43,6 +47,10 @@ public class CellValueModel {
             return model;
         }
 
+        /**
+         * build double cell value
+         * @return CellValueModel
+         */
         public static CellValueModel buildDoubleCellValueModel() {
             CellValueModel model = new CellValueModel();
             model.setValueType(CellValueType.DOUBLE);

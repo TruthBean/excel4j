@@ -2,7 +2,7 @@ package com.truthbean.code.excel4j.handler.transform;
 
 /**
  * @author TruthBean
- * @since 2018-01-15 16:36
+ * @since 0.0.1
  */
 public interface CellEntityValueHandler<O, R> {
 

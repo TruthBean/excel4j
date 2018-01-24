@@ -2,7 +2,7 @@ package com.truthbean.code.excel4j.common;
 
 /**
  * @author 璩诗斌
- * @date 2017-12-01
+ * @date 0.0.1
  */
 public final class Constants {
     private Constants(){}

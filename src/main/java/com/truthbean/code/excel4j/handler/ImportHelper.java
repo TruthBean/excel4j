@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * @author TruthBean
- * @since 2018-01-14 20:27
+ * @since 0.0.1
  */
 public final class ImportHelper {
     private ImportHelper() {
@@ -45,7 +45,7 @@ public final class ImportHelper {
         List<T> result = new ArrayList<>();
 
         Field[] fields = modelClass.getDeclaredFields();
-        Map<Integer, Field> cellMap = new HashMap<>();
+        Map<Integer, Field> cellMap = new HashMap<>(16);
         for (Field field : fields) {
             Column column = field.getAnnotation(Column.class);
             if (column != null) {

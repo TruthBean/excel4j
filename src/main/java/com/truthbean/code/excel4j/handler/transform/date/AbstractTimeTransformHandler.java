@@ -8,14 +8,24 @@ import java.util.Date;
 
 /**
  * @author TruthBean
- * @since 2018-01-15 16:52
+ * @since 0.0.1
  */
 public abstract class AbstractTimeTransformHandler implements CellEntityValueHandler<Date, String> {
 
+    /**
+     * date time format, eg 'YYYY-MM-DD HH:mm:SS'
+     */
     private String dateTimeFormat;
 
+    /**
+     * dateFormat class
+     */
     private SimpleDateFormat dateFormat;
 
+    /**
+     * set dateTimeFormat
+     * @param dateTimeFormat dateTimeFormat
+     */
     public void setFormat(String dateTimeFormat) {
         this.dateTimeFormat = dateTimeFormat;
         this.dateFormat = new SimpleDateFormat(dateTimeFormat);

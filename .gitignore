@@ -1,11 +1,25 @@
-# Created by .ignore support plugin (hsz.mobi)
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# idea files
 .idea/
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
 .gradle/
 
-gradle/
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 
-gradlew.bat
-gradlew
+out/
+/.nb-gradle/
 
-logs/
+build/
+docs/

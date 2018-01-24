@@ -4,12 +4,22 @@ import org.apache.poi.ss.usermodel.*;
 
 /**
  * @author TruthBean
- * @since 2018-01-15 11:38
+ * @since 0.0.1
  */
 public final class CellStyleHelper {
     private CellStyleHelper() {
     }
 
+    /**
+     * default heightInPoints
+     */
+    private static final short DEFAULT_HEIGHT_IN_POINTS = 16;
+
+    /**
+     * set excel cell big title default style
+     * @param workbook style create in workbook
+     * @return CellStyle
+     */
     public static CellStyle setBigTitleDefaultStyle(Workbook workbook) {
         // 设置列标题字体，样式
         Font bigTitleFont = workbook.createFont();
@@ -19,8 +29,7 @@ public final class CellStyleHelper {
         bigTitleFont.setColor(color);
         bigTitleFont.setItalic(false);
         bigTitleFont.setFontName("微软雅黑");
-        short heightInPoints = 16;
-        bigTitleFont.setFontHeightInPoints(heightInPoints);
+        bigTitleFont.setFontHeightInPoints(DEFAULT_HEIGHT_IN_POINTS);
 
         CellStyle bigTitleStyle = workbook.createCellStyle();
         // 设置边框

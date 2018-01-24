@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * @author TruthBean
- * @since 2018-01-14 19:59
+ * @since 0.0.1
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

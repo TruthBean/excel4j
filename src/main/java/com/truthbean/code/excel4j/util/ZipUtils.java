@@ -1,6 +1,8 @@
 package com.truthbean.code.excel4j.util;
 
 import org.apache.poi.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
@@ -8,16 +10,22 @@ import java.util.zip.*;
 
 /**
  * @author TruthBean
+ * @since 0.0.1
  */
 public final class ZipUtils {
     private ZipUtils() {
     }
 
     /**
+     * slf4j logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtils.class);
+
+    /**
      * 压缩目录，注意，中文乱码，目录中不能有嵌套的目录,将不会被压缩到压缩文件中
      * @param dir 目录
      * @param dest 目标压缩文件.zip
-     * @throws Exception
+     * @throws Exception throw exception when error
      */
     public static void zip(String dir, String dest) throws Exception {
 
@@ -110,13 +118,13 @@ public final class ZipUtils {
      * 文件解压缩 注意 不能有中文文件名
      * @param zipSrc zip文件路径
      * @param dest 解压的路径，无需以“\\”或者“/”结尾
-     * @throws IOException
+     * @throws IOException exception
      */
     public static void unzip(String zipSrc, String dest) throws IOException {
 
         //为了适配不同操作系统的文件路径的分隔符
         String systemSeparator = System.getProperty("file.separator");
-        System.out.println(systemSeparator);
+        LOGGER.debug(systemSeparator);
 
         CheckedInputStream cis = new CheckedInputStream(new FileInputStream(new File(zipSrc)), new CRC32());
         ZipInputStream zis = new ZipInputStream(cis);
@@ -139,7 +147,7 @@ public final class ZipUtils {
             if (fileName.lastIndexOf(systemSeparator) == fileName.length() - 1) {
                 continue;
             }
-            System.out.println(fileName);
+            LOGGER.debug(fileName);
             fos = new FileOutputStream(fileName);
             while ((length = zis.read(buffer)) != -1) {
                 fos.write(buffer, 0, length);

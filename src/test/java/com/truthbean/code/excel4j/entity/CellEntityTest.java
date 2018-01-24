@@ -3,6 +3,7 @@ package com.truthbean.code.excel4j.entity;
 import com.truthbean.code.excel4j.annotation.Column;
 import com.truthbean.code.excel4j.annotation.ColumnValue;
 import com.truthbean.code.excel4j.annotation.Sheet;
+import com.truthbean.code.excel4j.handler.transform.number.DoubleTransformHandler;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -15,7 +16,7 @@ import java.util.Date;
 public class CellEntityTest {
 
     @Column(order = 2, name = "ID", columnValue = @ColumnValue(
-            type = CellValueType.DOUBLE
+            type = CellValueType.DOUBLE, transformHandler = DoubleTransformHandler.class
     ), width = 2864)
     private int id;
 

@@ -4,7 +4,7 @@ import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 
 /**
  * @author TruthBean
- * @since 2018-01-15 17:25
+ * @since 0.0.1
  */
 public abstract class AbstractTextTransformHandler<T> implements CellEntityValueHandler<T, String> {
     @Override

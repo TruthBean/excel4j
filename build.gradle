@@ -1,13 +1,131 @@
-group = 'com.truthbean.code'
-version = '0.0.2'
+group = POM_ARTIFACT_ID
+version = VERSION_NAME
 
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
+// The Maven plugin adds support for deploying artifacts to Maven repositories.
 apply plugin: 'maven'
+// The signing plugin adds the ability to digitally sign built files and artifacts.
+// These digital signatures can then be used to prove who built the artifact the signature is attached to
+// as well as other information such as when the signature was generated.
+apply plugin: 'signing'
+
+// 声明变量记录maven库地址
+def mavenRepositoryUrl
+// 判断是发布到正式库,还是snapshots库
+if (isReleaseBuild()) {
+    println 'RELEASE BUILD'
+    // 下面的库地址指向的是我们私有仓库的Releases 仓库
+    mavenRepositoryUrl = hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+} else {
+    println 'SNAPSHOTS BUILD'
+    // 下面的库地址指向的是我们私有仓库的snapshots 仓库
+    mavenRepositoryUrl = hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+            : "https://oss.sonatype.org/content/repositories/snapshots"
+}
+// NEXUS_USERNAME等变量在我们主项目的gradle.properties中可以找到
+def getRepositoryUsername() {
+    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+}
+// 根据我们在likelib下gradle.properties中声明的版本名称,来分辨是Release版本还是 snapshots版本
+def isReleaseBuild() {
+    return !VERSION_NAME.contains("SNAPSHOT")
+}
+
+//"afterEvaluate是什么鸟？你可以理解为在配置阶段要结束，项目评估完会走到这一步。"
+afterEvaluate { project ->
+    // 我们声明我们要执行的上传到maven的task
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                // 这样就类似坐标的方式定位到了制定的库文件
+                pom.artifactId = POM_ARTIFACT_ID
+                pom.groupId = POM_GROUP_ID
+                pom.version = VERSION_NAME
+
+                // 授权验证,这里也就是你登陆搭建的私服服务器时候的用户名\密码
+                repository(url: mavenRepositoryUrl) {
+                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                }
+
+                // 这里是配置我们maven库需要的pom.xml文件的各个内容,具体意思我们在主目录gradle.properties中解释
+                pom.project {
+                    name POM_NAME
+                    packaging POM_PACKAGING
+                    description POM_DESCRIPTION
+                    url POM_URL
+
+                    scm {
+                        url POM_SCM_URL
+                        connection POM_SCM_CONNECTION
+                        developerConnection POM_SCM_DEV_CONNECTION
+                    }
+
+                    licenses {
+                        license {
+                            name POM_LICENCE_NAME
+                            url POM_LICENCE_URL
+                            distribution POM_LICENCE_DIST
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id POM_DEVELOPER_ID
+                            name POM_DEVELOPER_NAME
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 进行数字签名
+    signing {
+        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
+
+    // 生成javadoc.jar
+    task generateJavadoc(type: Jar) {
+        group = 'jar'
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    javadoc {
+        options {
+            encoding "UTF-8"
+            charSet 'UTF-8'
+            author true
+            version true
+        }
+    }
+
+    // 生成sources.jar
+    task generateSourcesJar(type: Jar) {
+        group = 'jar'
+        from sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    }
+
+    // 产生相关配置文件的任务
+    artifacts {
+        archives generateSourcesJar
+        archives generateJavadoc
+    }
+}
 
 // In this section you declare where to find the dependencies of your project
 repositories {
     mavenLocal()
+    mavenCentral()
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
 }
 
