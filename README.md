@@ -14,6 +14,20 @@ And ...
 
 ### example
 
+#### maven
+```xml
+<dependency>
+  <groupId>com.truthbean.code</groupId>
+  <artifactId>excel4j</artifactId>
+  <version>0.0.1-RELEASE</version>
+</dependency>
+```
+
+#### gradle
+```groovy
+compile 'com.truthbean.code:excel4j:0.0.1-RELEASE'
+```
+
 Using annotation
 
 ```java
