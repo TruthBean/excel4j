@@ -53,7 +53,7 @@ public class CellValueModel {
          */
         public static CellValueModel buildDoubleCellValueModel() {
             CellValueModel model = new CellValueModel();
-            model.setValueType(CellValueType.DOUBLE);
+            model.setValueType(CellValueType.NUMBER);
             model.setValueHandler(new DoubleTransformHandler());
             return model;
         }

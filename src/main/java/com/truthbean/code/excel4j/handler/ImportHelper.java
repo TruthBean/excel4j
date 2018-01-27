@@ -3,6 +3,7 @@ package com.truthbean.code.excel4j.handler;
 import com.truthbean.code.excel4j.annotation.Column;
 import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.code.excel4j.handler.transform.TransformFactory;
+import com.truthbean.code.excel4j.util.ReflectionUtils;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 
@@ -31,20 +32,31 @@ public final class ImportHelper {
      * @throws Exception
      */
     public static <T> List<T> readDataFromExcel(File file, Class<T> modelClass) throws Exception {
-        List<List<String>> contents = new ArrayList<>();
+        List<Map<String, String>> contents = readDataFromExcel(file);
+        return handleData(contents.subList(2, contents.size()), modelClass);
+    }
+
+    /**
+     * read data from excel file
+     * @param file file
+     * @return list of Map<String, String>
+     * @throws Exception
+     */
+    public static List<Map<String, String>> readDataFromExcel(File file)  throws Exception {
+        List<Map<String, String>> contents = new ArrayList<>();
         // The package open is instantaneous, as it should be.
         try (OPCPackage opcPackage = OPCPackage.open(file.getPath(), PackageAccess.READ)) {
             XlsxExcel2Csv xlsxExcel2Csv = new XlsxExcel2Csv(opcPackage, contents);
             xlsxExcel2Csv.process();
         }
-
-        return handleData(contents.subList(2, contents.size()), modelClass);
+        return contents;
     }
 
-    private static <T> List<T> handleData(List<List<String>> content, Class<T> modelClass) throws Exception {
+    //TODO: SHOULD HANDLE WITH IT
+    private static <T> List<T> handleData(List<Map<String, String>> content, Class<T> modelClass) throws Exception {
         List<T> result = new ArrayList<>();
 
-        Field[] fields = modelClass.getDeclaredFields();
+        List<Field> fields = ReflectionUtils.getDeclaredFields(modelClass);
         Map<Integer, Field> cellMap = new HashMap<>(16);
         for (Field field : fields) {
             Column column = field.getAnnotation(Column.class);
@@ -54,7 +66,7 @@ public final class ImportHelper {
         }
 
         T model;
-        for (List<String> row : content) {
+        for (Map<String, String> row : content) {
             model = modelClass.getDeclaredConstructor().newInstance();
             for (int i = 0; i < row.size(); i++) {
                 Field field = cellMap.get(i + 1);

@@ -3,7 +3,6 @@ package com.truthbean.code.excel4j.handler;
 import com.truthbean.code.excel4j.annotation.ExcelEntityHandler;
 import com.truthbean.code.excel4j.entity.*;
 import com.truthbean.code.excel4j.util.ZipUtils;
-import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -17,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ExportHelperTest {
 
-    @Test
+    //@Test
     public void testThread() throws InterruptedException {
         long begin = System.currentTimeMillis();
 
@@ -65,7 +64,7 @@ public class ExportHelperTest {
 
     }
 
-    @Test
+    //@Test
     public void testBigData() {
         long begin = System.currentTimeMillis();
         List<CellEntityTest> list = new ArrayList<>();
@@ -88,20 +87,20 @@ public class ExportHelperTest {
         System.out.println(System.currentTimeMillis() - begin);
     }
 
-    @Test
+    //@Test
     public void handle() {
         List<CellEntityTest> list = new ArrayList<>();
         ExcelModel excelModel = ExportHelper.handleData(list, CellEntityTest.class);
         ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
     }
 
-    @Test
+    //@Test
     public void handleExcelInfo() {
         List<CellEntityTest> list = new ArrayList<>();
         CellEntityTest test = new CellEntityTest();
         test.setTime(new Date());
         test.setUserName("user");
-        test.setDecimal(new BigDecimal("12345678890.01"));
+        test.setDecimal(new BigDecimal("-12345678890.01"));
         list.add(test);
 
         ExcelEntityHandler<CellEntityTest> entityHandler = new ExcelEntityHandler<>(CellEntityTest.class);
@@ -113,10 +112,10 @@ public class ExportHelperTest {
 
         entityHandler.handleExcelBigContent(excelModel, content);
 
-        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
+        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xlsx", "D:\\develop\\data\\applogs\\");
     }
 
-    @Test
+    //@Test
     public void writeToFile() {
         ExcelModel excelModel = new ExcelModel();
 

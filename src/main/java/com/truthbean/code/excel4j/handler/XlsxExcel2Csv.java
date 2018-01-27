@@ -21,8 +21,9 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A rudimentary XLSX -> CSV processor modeled on the
@@ -62,7 +63,7 @@ public class XlsxExcel2Csv {
         private int currentRow = -1;
         private int currentCol = -1;
 
-        private List<String> row = new ArrayList<>();
+        private Map<String, String> row = new HashMap<>();
 
         @Override
         public void startRow(int rowNum) {
@@ -70,7 +71,7 @@ public class XlsxExcel2Csv {
             firstCellOfRow = true;
             currentRow = rowNum;
             currentCol = -1;
-            row = new ArrayList<>();
+            row = new HashMap<>();
         }
 
         @Override
@@ -94,7 +95,7 @@ public class XlsxExcel2Csv {
 
             currentCol = (int) (new CellReference(cellReference)).getCol();
 
-            row.add(formattedValue);
+            row.put(cellReference, formattedValue);
 
         }
 
@@ -109,14 +110,14 @@ public class XlsxExcel2Csv {
 
     private final OPCPackage xlsxPackage;
 
-    private List<List<String>> contents;
+    private List<Map<String, String>> contents;
 
     /**
      * Creates a new XLSX -> CSV converter
      *  @param pkg        The XLSX package to process
      * @param contents output the CSV to
      */
-    public XlsxExcel2Csv(OPCPackage pkg, List<List<String>> contents) {
+    public XlsxExcel2Csv(OPCPackage pkg, List<Map<String, String>> contents) {
         this.xlsxPackage = pkg;
         this.contents = contents;
     }

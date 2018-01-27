@@ -1,7 +1,6 @@
 package com.truthbean.code.excel4j.handler;
 
 import com.truthbean.code.excel4j.entity.CellEntityTest;
-import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
@@ -12,10 +11,10 @@ import java.util.List;
  */
 public class ImportHelperTest {
 
-    @Test
+    //@Test
     public void readDataFromExcel() throws Exception {
         long begin = System.currentTimeMillis();
-        File file = new File("D:\\develop\\data\\applogs\\203a1072-0fac-459d-8713-4e9ea854d993.xlsx");
+        File file = new File("D:\\develop\\data\\applogs\\7923cd7b-351a-4c33-bd6d-ed0b12a69202.xlsx");
         List<CellEntityTest> cellEntityTests = ImportHelper.readDataFromExcel(file, CellEntityTest.class);
         System.out.println(cellEntityTests);
         System.out.println(System.currentTimeMillis() - begin);

@@ -13,8 +13,17 @@ public enum CellValueType {
 
     /**
      * numeric
+     * Deprecated since 0.0.2
+     * replace by #NUMBER
      */
+    @Deprecated
     DOUBLE,
+
+    /**
+     * numeric value
+     * @since 0.0.2
+     */
+    NUMBER,
 
     /**
      * date time

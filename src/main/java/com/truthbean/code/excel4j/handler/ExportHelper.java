@@ -225,7 +225,9 @@ public final class ExportHelper {
         CellEntityValueHandler valueHandler = valueModel.getValueHandler();
         if (isExcel2003) {
             switch (valueClass) {
+                //remove the DOUBLE in next version
                 case DOUBLE:
+                case NUMBER:
                     handleDoubleValue(value, cell);
                     break;
                 case DATE:
@@ -240,7 +242,9 @@ public final class ExportHelper {
             }
         } else {
             switch (valueClass) {
+                //remove the DOUBLE in next version
                 case DOUBLE:
+                case NUMBER:
                     handleDoubleValue(value, cell);
                     break;
                 case DATE:

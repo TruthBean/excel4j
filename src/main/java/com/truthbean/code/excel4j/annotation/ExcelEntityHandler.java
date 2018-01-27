@@ -4,9 +4,9 @@ import com.truthbean.code.excel4j.entity.*;
 import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.code.excel4j.handler.transform.date.DefaultTimeTransformHandler;
 import com.truthbean.code.excel4j.handler.transform.text.DefaultTextTransformHandler;
+import com.truthbean.code.excel4j.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -67,7 +67,7 @@ public class ExcelEntityHandler<T> {
             //title
             List<CellModel> titles = new ArrayList<>();
 
-            Field[] fields = cellModelClass.getDeclaredFields();
+            List<Field> fields = ReflectionUtils.getDeclaredFields(cellModelClass);
 
             CellModel title;
             Column column;
@@ -75,10 +75,6 @@ public class ExcelEntityHandler<T> {
                 column = field.getAnnotation(Column.class);
                 if (column == null) {
                     continue;
-                }
-
-                if (!Modifier.isPublic(field.getModifiers())) {
-                    field.setAccessible(true);
                 }
 
                 title = new CellModel();
@@ -118,7 +114,7 @@ public class ExcelEntityHandler<T> {
             //row
             List<CellModel> row = new ArrayList<>();
 
-            Field[] fields = cellModelClass.getDeclaredFields();
+            List<Field> fields = ReflectionUtils.getDeclaredFields(cellModelClass);
 
             Object fieldValue;
 
@@ -133,10 +129,10 @@ public class ExcelEntityHandler<T> {
                     continue;
                 }
 
-                if (!Modifier.isPublic(field.getModifiers())) {
-                    field.setAccessible(true);
-                }
-                fieldValue = field.get(cellModel);
+                //invoke get method rather than get the field value
+                //so you can custom the data in this filed in get method
+                //NOTE: if the method cannot access, get the field value
+                fieldValue = ReflectionUtils.getPropertyValue(cellModel, field);
 
                 cellEntity = new CellModel();
                 if (fieldValue == null) {
@@ -179,7 +175,7 @@ public class ExcelEntityHandler<T> {
             row.sort(Comparator.comparingInt(CellModel::getOrder));
 
             //此行应该为空
-            if (counter != fields.length) {
+            if (counter != fields.size()) {
                 content.add(row);
             }
 

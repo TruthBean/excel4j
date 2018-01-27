@@ -19,13 +19,13 @@ And ...
 <dependency>
   <groupId>com.truthbean.code</groupId>
   <artifactId>excel4j</artifactId>
-  <version>0.0.1-RELEASE</version>
+  <version>0.0.2-RELEASE</version>
 </dependency>
 ```
 
 #### gradle
 ```groovy
-compile 'com.truthbean.code:excel4j:0.0.1-RELEASE'
+compile 'com.truthbean.code:excel4j:0.0.2-RELEASE'
 ```
 
 Using annotation
@@ -94,3 +94,44 @@ this transformHandler is your CustomDoubleTransformHandler
 
 ### attache
 this project is just started, I am glad to see you join。
+
+### release
+##### 0.0.1-RELEASE
+first version, init project
+
+##### 0.0.2-RELEASE
+1. add cell entity model's super class support
+eg: 
+```java
+@Sheet(name = "测试SHEET", bigTitle = "hello excel4j")
+public class CellEntityTest extends CommonEntityTest {
+
+    @Column(name = "ShortNum", columnValue = @ColumnValue(type = CellValueType.NUMBER))
+    private long shortNum;
+
+    @Column(order = 3, name = "用户名", width = 9000)
+    private String userName;
+
+    @Column(order = 5, name = "时间", columnValue = @ColumnValue(type = CellValueType.DATE))
+    private Date time;
+
+    @Column(order = 4, name = "金额", columnValue = @ColumnValue(type = CellValueType.NUMBER,
+            transformHandler = BigDecimalTransformHandler.class))
+    private BigDecimal decimal;
+    
+    ...
+}
+
+public class CommonEntityTest {
+
+    @Column(order = 2, name = "ID", columnValue = @ColumnValue(
+            type = CellValueType.DOUBLE, transformHandler = DoubleTransformHandler.class
+    ), width = 2864)
+    private int id;
+    ...
+}
+```
+
+2. get cell entity model filed value by invoke getter method
+
+3. get map data from excel, get model (class) data from excel is not work, next version will handle it 

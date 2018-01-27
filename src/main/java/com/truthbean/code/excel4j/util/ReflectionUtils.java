@@ -1,21 +1,35 @@
 package com.truthbean.code.excel4j.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 反射Utils 函数集合 提供访问私有变量, 获取泛型类型 Class, 提取集合中元素属性等 Utils 函数
  * @author TruthBean
  * @since 0.0.1
  */
-public class ReflectionUtils {
+public final class ReflectionUtils {
+
+    /**
+     * slf4j logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
+
+    private ReflectionUtils() {
+    }
 
     /**
      * 通过反射, 获得定义 Class 时声明的父类的泛型参数的类型 : public EmployeeDao extends
      * BaseDao<Employee, String>
      *
-     * @param clazz
-     * @param index
-     * @return
+     * @param clazz class
+     * @param index index
+     * @return class
      */
     public static Class<?> getSuperClassGenricType(Class<?> clazz, int index) {
         Type genType = clazz.getGenericSuperclass();
@@ -46,7 +60,7 @@ public class ReflectionUtils {
      * @return
      */
     @SuppressWarnings("unchecked")
-	public static <T> Class<T> getSuperGenericType(Class<?> clazz) {
+    public static <T> Class<T> getSuperGenericType(Class<?> clazz) {
         return (Class<T>) getSuperClassGenricType(clazz, 0);
     }
 
@@ -73,9 +87,9 @@ public class ReflectionUtils {
     }
 
     /**
-     * �? filed 变为可访�?
+     * make field public
      *
-     * @param field
+     * @param field field
      */
     public static void makeAccessible(Field field) {
         if (!Modifier.isPublic(field.getModifiers())) {
@@ -102,6 +116,14 @@ public class ReflectionUtils {
         return null;
     }
 
+    public static List<Field> getDeclaredFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+            fields.addAll(Arrays.asList(superClass.getDeclaredFields()));
+        }
+        return fields;
+    }
+
     /**
      * 直接调用对象方法, 而忽略修饰符(private, protected)
      *
@@ -114,7 +136,7 @@ public class ReflectionUtils {
      * @throws IllegalArgumentException
      */
     public static Object invokeMethod(Object object, String methodName, Class<?>[] parameterTypes,
-            Object[] parameters) throws InvocationTargetException {
+                                      Object[] parameters) throws InvocationTargetException {
 
         Method method = getDeclaredMethod(object, methodName, parameterTypes);
 
@@ -140,7 +162,7 @@ public class ReflectionUtils {
      * @param fieldName
      * @param value
      */
-    public static void setFieldValue(Object object, String fieldName, Object value) {
+    public static Object setFieldValue(Object object, String fieldName, Object value) {
         Field field = getDeclaredField(object, fieldName);
 
         if (field == null) {
@@ -154,6 +176,8 @@ public class ReflectionUtils {
         } catch (IllegalAccessException e) {
             System.out.println("不可能抛出的异常");
         }
+
+        return object;
     }
 
     /**
@@ -177,10 +201,102 @@ public class ReflectionUtils {
         try {
             result = field.get(object);
         } catch (IllegalAccessException e) {
-            System.out.println("不可能抛出的异常");
+            LOGGER.error("不可能抛出的异常");
         }
 
         return result;
     }
-    
+
+    /**
+     * invoke set method
+     * @param target target object
+     * @param fieldName field name
+     * @param arg arg
+     * @param parameterTypes arg type
+     * @return invoke method result
+     */
+    public static Object invokeSetMethod(Object target, String fieldName, Object arg, Class<?>... parameterTypes) {
+        String methodName = "set" + handleFieldName(fieldName);
+        try {
+            Method method = target.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(target, arg);
+        } catch (NoSuchMethodException e) {
+            LOGGER.error(fieldName + " set method not found", e);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * invoke set method
+     * @param target target object
+     * @param fieldName field name
+     * @param arg arg
+     * @param parameterTypes arg type
+     * @return invoke method result
+     */
+    public static Object setPropertyValue(Object target, String fieldName, Object arg, Class<?>... parameterTypes) {
+        Object o = invokeSetMethod(target, fieldName, arg, parameterTypes);
+        if (o == null) {
+            o = setFieldValue(target, fieldName, arg);
+        }
+        return 0;
+    }
+
+    /**
+     * invoke get method
+     * @param target target object
+     * @param fieldName field name
+     * @return invoke method result
+     */
+    public static Object invokeGetMethod(Object target, String fieldName) {
+        String methodName = "get" + handleFieldName(fieldName);
+        try {
+            Method method = target.getClass().getMethod(methodName);
+            return method.invoke(target);
+        } catch (NoSuchMethodException e) {
+            LOGGER.warn(fieldName + " set method not found", e);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            LOGGER.warn(fieldName + " invoke error", e);
+        }
+        return null;
+    }
+
+    public static Object getPropertyValue(Object target, String fieldName) {
+        Object o = invokeGetMethod(target, fieldName);
+        if (o == null) {
+            o = getFieldValue(target, fieldName);
+        }
+        return o;
+    }
+
+    public static Object getPropertyValue(Object target, Field field) {
+        return getPropertyValue(target, field.getName());
+    }
+
+    /**
+     * make char of field name upper
+     * @param fieldName filed name
+     * @return string
+     */
+    private static String handleFieldName(String fieldName) {
+        String string = fieldName.substring(0, 1).toUpperCase();
+        if (fieldName.length() > 1) {
+            string += fieldName.substring(1);
+        }
+        return string;
+    }
+
+    /**
+     * invoke get method
+     * @param target target object
+     * @param field field
+     * @return invoke method result
+     */
+    public static Object invokeGetMethod(Object target, Field field) {
+        String fieldName = field.getName();
+        return invokeGetMethod(target, fieldName);
+    }
+
 }
