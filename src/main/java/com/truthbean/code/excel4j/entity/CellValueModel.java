@@ -1,5 +1,6 @@
 package com.truthbean.code.excel4j.entity;
 
+import com.truthbean.code.excel4j.common.WorkbookPictureType;
 import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.code.excel4j.handler.transform.number.DoubleTransformHandler;
 import com.truthbean.code.excel4j.handler.transform.text.DefaultTextTransformHandler;
@@ -19,6 +20,8 @@ public class CellValueModel {
      */
     private CellEntityValueHandler valueHandler;
 
+    private PictureInfo pictureInfo;
+
     public CellValueType getValueType() {
         return valueType;
     }
@@ -33,6 +36,14 @@ public class CellValueModel {
 
     public void setValueHandler(CellEntityValueHandler valueHandler) {
         this.valueHandler = valueHandler;
+    }
+
+    public PictureInfo getPictureInfo() {
+        return pictureInfo;
+    }
+
+    public void setPictureInfo(PictureInfo pictureInfo) {
+        this.pictureInfo = pictureInfo;
     }
 
     public static class CellValueModelBuilder {

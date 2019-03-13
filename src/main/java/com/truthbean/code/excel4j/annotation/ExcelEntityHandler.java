@@ -25,6 +25,7 @@ public class ExcelEntityHandler<T> {
 
     /**
      * constructor, handle cellModel class
+     *
      * @param cellModelClass cellModel class
      */
     public ExcelEntityHandler(Class<T> cellModelClass) {
@@ -34,6 +35,7 @@ public class ExcelEntityHandler<T> {
 
     /**
      * handle excel title
+     *
      * @return ExcelModel
      */
     public ExcelModel handleExcelTitle() {
@@ -47,24 +49,34 @@ public class ExcelEntityHandler<T> {
             String sheetName = sheet.name();
             excelModel.setSheetName(sheetName);
 
-            //big title
-            boolean noBigTitle = sheet.noBigTitle();
-            excelModel.setNoBigTitle(noBigTitle);
-            if (!noBigTitle) {
-                CellModel bigTitle = new CellModel();
-                bigTitle.setValue(sheet.bigTitle());
+            Table table = cellModelClass.getAnnotation(Table.class);
 
-                CellValueModel model = new CellValueModel();
-                model.setValueType(CellValueType.TEXT);
-                bigTitle.setValueModel(model);
+            short rowHeight = -1;
+            if (table != null) {
+                //big title
+                boolean noBigTitle = table.noBigTitle();
+                excelModel.setNoBigTitle(noBigTitle);
+                if (!noBigTitle) {
+                    CellModel bigTitle = new CellModel();
+                    bigTitle.setValue(table.bigTitle());
 
-                CellStyleModel styleModel = new CellStyleModel();
-                bigTitle.setStyleModel(styleModel);
+                    CellValueModel model = new CellValueModel();
+                    model.setValueType(CellValueType.TEXT);
+                    bigTitle.setValueModel(model);
 
-                excelModel.setBigTitle(bigTitle);
+                    CellStyleModel styleModel = new CellStyleModel();
+                    bigTitle.setStyleModel(styleModel);
+
+                    excelModel.setBigTitle(bigTitle);
+                }
+
+                rowHeight = table.rowHeight();
             }
 
+            excelModel.setContentRowHeight(rowHeight);
+
             //title
+            RowModel titleRow = new RowModel();
             List<CellModel> titles = new ArrayList<>();
 
             List<Field> fields = ReflectionUtils.getDeclaredFields(cellModelClass);
@@ -94,7 +106,8 @@ public class ExcelEntityHandler<T> {
 
             //sort by order
             titles.sort(Comparator.comparingInt(CellModel::getOrder));
-            excelModel.setTitles(titles);
+            titleRow.setCellModels(titles);
+            excelModel.setTitles(titleRow);
 
             return excelModel;
         } catch (Exception e) {
@@ -106,12 +119,14 @@ public class ExcelEntityHandler<T> {
 
     /**
      * handle each excel row
+     *
      * @param cellModel cell model
-     * @param content content
+     * @param content   content
      */
-    public void handleExcelRow(T cellModel, List<List<CellModel>> content) {
+    public void handleExcelRow(T cellModel, List<RowModel> content, int order) {
         try {
             //row
+            RowModel rowModel = new RowModel();
             List<CellModel> row = new ArrayList<>();
 
             List<Field> fields = ReflectionUtils.getDeclaredFields(cellModelClass);
@@ -173,10 +188,12 @@ public class ExcelEntityHandler<T> {
 
             //sort by order
             row.sort(Comparator.comparingInt(CellModel::getOrder));
+            rowModel.setCellModels(row);
+            rowModel.setOrder(order + 1);
 
             //此行应该为空
             if (counter != fields.size()) {
-                content.add(row);
+                content.add(rowModel);
             }
 
         } catch (Exception e) {
@@ -186,14 +203,16 @@ public class ExcelEntityHandler<T> {
     }
 
     public void handleExcelBigContent(ExcelModel excelModel, List<List<T>> lists) {
-        List<List<List<CellModel>>> contentList = new ArrayList<>();
+        List<List<RowModel>> contentList = new ArrayList<>();
 
-        List<List<CellModel>> content;
+        List<RowModel> content;
 
-        for (List<T> tList : lists) {
+        for (int i = 0; i < lists.size(); i++) {
             content = new ArrayList<>();
-            for (T model : tList) {
-                handleExcelRow(model, content);
+            List<T> ts = lists.get(i);
+            int tsSize = ts.size();
+            for (int j = 0; j < tsSize; j++) {
+                handleExcelRow(ts.get(j), content, i * tsSize + j);
             }
             contentList.add(content);
         }
@@ -205,10 +224,10 @@ public class ExcelEntityHandler<T> {
         excelModel.setBigDataContent(contentList);
     }
 
-    public void handleExcelContent(ExcelModel excelModel, Collection<T> tList) {
-        List<List<CellModel>> content = new ArrayList<>();
-        for (T model : tList) {
-            handleExcelRow(model, content);
+    public void handleExcelContent(ExcelModel excelModel, List<T> list) {
+        List<RowModel> content = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            handleExcelRow(list.get(i), content, i);
         }
         excelModel.setContent(content);
     }

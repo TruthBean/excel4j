@@ -3,6 +3,7 @@ package com.truthbean.code.excel4j.entity;
 import com.truthbean.code.excel4j.annotation.Column;
 import com.truthbean.code.excel4j.annotation.ColumnValue;
 import com.truthbean.code.excel4j.annotation.Sheet;
+import com.truthbean.code.excel4j.annotation.Table;
 import com.truthbean.code.excel4j.handler.transform.number.BigDecimalTransformHandler;
 
 import java.math.BigDecimal;
@@ -12,7 +13,8 @@ import java.util.Date;
  * @author TruthBean
  * @since 2018-01-14 20:13
  */
-@Sheet(name = "测试SHEET", bigTitle = "hello excel4j")
+@Sheet(name = "测试SHEET")
+@Table(bigTitle = "hello excel4j")
 public class CellEntityTest extends CommonEntityTest {
 
     @Column(name = "ShortNum", columnValue = @ColumnValue(type = CellValueType.NUMBER))

@@ -12,14 +12,6 @@ public enum CellValueType {
     TEXT,
 
     /**
-     * numeric
-     * Deprecated since 0.0.2
-     * replace by #NUMBER
-     */
-    @Deprecated
-    DOUBLE,
-
-    /**
      * numeric value
      * @since 0.0.2
      */
@@ -28,5 +20,11 @@ public enum CellValueType {
     /**
      * date time
      */
-    DATE
+    DATE,
+
+    /**
+     * picture
+     * @since 0.0.3
+     */
+    PICTURE
 }

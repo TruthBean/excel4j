@@ -11,7 +11,7 @@ import com.truthbean.code.excel4j.handler.transform.number.DoubleTransformHandle
 public class CommonEntityTest {
 
     @Column(order = 2, name = "ID", columnValue = @ColumnValue(
-            type = CellValueType.DOUBLE, transformHandler = DoubleTransformHandler.class
+            type = CellValueType.NUMBER, transformHandler = DoubleTransformHandler.class
     ), width = 2864)
     private int id;
 

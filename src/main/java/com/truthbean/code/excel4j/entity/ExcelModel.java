@@ -33,17 +33,19 @@ public class ExcelModel {
     /**
      * excel title
      */
-    private List<CellModel> titles;
+    private RowModel titles;
+
+    private short contentRowHeight;
 
     /**
      * excel content
      */
-    private List<List<CellModel>> content;
+    private List<RowModel> content;
 
     /**
      * if content data is big, use it
      */
-    private List<List<List<CellModel>>> bigDataContent;
+    private List<List<RowModel>> bigDataContent;
 
     /**
      * is excel 2003
@@ -84,19 +86,19 @@ public class ExcelModel {
         this.bigTitle = bigTitle;
     }
 
-    public List<CellModel> getTitles() {
+    public RowModel getTitles() {
         return titles;
     }
 
-    public void setTitles(List<CellModel> titles) {
+    public void setTitles(RowModel titles) {
         this.titles = titles;
     }
 
-    public List<List<CellModel>> getContent() {
+    public List<RowModel> getContent() {
         return content;
     }
 
-    public void setContent(List<List<CellModel>> content) {
+    public void setContent(List<RowModel> content) {
         this.content = content;
     }
 
@@ -124,11 +126,11 @@ public class ExcelModel {
         this.begin = begin;
     }
 
-    public List<List<List<CellModel>>> getBigDataContent() {
+    public List<List<RowModel>> getBigDataContent() {
         return bigDataContent;
     }
 
-    public void setBigDataContent(List<List<List<CellModel>>> bigDataContent) {
+    public void setBigDataContent(List<List<RowModel>> bigDataContent) {
         this.bigDataContent = bigDataContent;
     }
 
@@ -138,5 +140,13 @@ public class ExcelModel {
 
     public void setNoBigTitle(boolean noBigTitle) {
         this.noBigTitle = noBigTitle;
+    }
+
+    public short getContentRowHeight() {
+        return contentRowHeight;
+    }
+
+    public void setContentRowHeight(short contentRowHeight) {
+        this.contentRowHeight = contentRowHeight;
     }
 }

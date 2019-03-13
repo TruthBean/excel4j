@@ -12,11 +12,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
@@ -244,27 +242,5 @@ public final class ExcelUtils {
         //冻结第一、二行
         sheet.createFreezePane(0, 2);
         return begin;
-    }
-
-    /**
-     * 通过HttpServletResponse返回给请求方
-     * @param response HttpServletResponse
-     * @param filename 文件名称
-     * @param workbook workbook
-     */
-    public static void writeToServletResponse(HttpServletResponse response, String filename, Workbook workbook) {
-        //severlet 响应生成excel文件
-        try {
-            String head = new String(filename.getBytes("GB2312"), "ISO-8859-1");
-            response.reset();
-            response.setContentType("application/vnd.ms-excel");
-            response.addHeader("Content-Disposition", "attachment; filename=" + head);
-            OutputStream os = response.getOutputStream();
-            workbook.write(os);
-            workbook.close();
-            os.close();
-        } catch (IOException e) {
-            LOGGER.error("", e);
-        }
     }
 }

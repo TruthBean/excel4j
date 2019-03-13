@@ -1,7 +1,7 @@
 package com.truthbean.code.excel4j.util;
 
 import com.truthbean.code.excel4j.entity.CellEntityTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

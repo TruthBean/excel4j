@@ -1,9 +1,12 @@
 package com.truthbean.code.excel4j.handler;
 
 import com.truthbean.code.excel4j.annotation.ExcelEntityHandler;
+import com.truthbean.code.excel4j.common.WorkbookPictureType;
 import com.truthbean.code.excel4j.entity.*;
 import com.truthbean.code.excel4j.util.ZipUtils;
+import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -94,7 +97,7 @@ public class ExportHelperTest {
         ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
     }
 
-    //@Test
+    @Test
     public void handleExcelInfo() {
         List<CellEntityTest> list = new ArrayList<>();
         CellEntityTest test = new CellEntityTest();
@@ -112,10 +115,10 @@ public class ExportHelperTest {
 
         entityHandler.handleExcelBigContent(excelModel, content);
 
-        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xlsx", "D:\\develop\\data\\applogs\\");
+        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xlsx", "D:\\");
     }
 
-    //@Test
+    @Test
     public void writeToFile() {
         ExcelModel excelModel = new ExcelModel();
 
@@ -134,7 +137,7 @@ public class ExportHelperTest {
         title1.setValue("用户名");
         title1.setOrder(1);
         CellStyleModel title1Model = new CellStyleModel();
-        title1Model.setColumnWidth(10000);
+        // title1Model.setColumnWidth(10000);
         title1.setStyleModel(title1Model);
         titles.add(title1);
 
@@ -156,10 +159,22 @@ public class ExportHelperTest {
         title3.setStyleModel(title3Model);
         titles.add(title3);
 
-        excelModel.setTitles(titles);
+        CellModel title4 = new CellModel();
+        title4.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
+        title4.setValue("图片");
+        title4.setOrder(4);
+        CellStyleModel title4Model = new CellStyleModel();
+        title4Model.setColumnWidth(8000);
+        title4.setStyleModel(title3Model);
+        titles.add(title4);
+
+        Collections.sort(titles);
+
+        RowModel titleRow = new RowModel();
+        titleRow.setCellModels(titles);
+        excelModel.setTitles(titleRow);
 
         //内容
-        List<List<CellModel>> content = new ArrayList<>();
         List<CellModel> row1 = new ArrayList<>();
         CellModel cell1 = new CellModel();
         cell1.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
@@ -176,16 +191,38 @@ public class ExportHelperTest {
         CellModel cell2 = new CellModel();
         cell2.setValueModel(CellValueModel.CellValueModelBuilder.buildTextCellValueModel());
         cell2.setValue("时间");
-        row1.add(title2);
         cell2.setOrder(2);
-        content.add(row1);
+        row1.add(cell2);
+
+        CellModel cell4 = new CellModel();
+        CellValueModel jpegValueModel = new CellValueModel();
+        PictureInfo pictureInfo = new PictureInfo();
+        pictureInfo.setType(WorkbookPictureType.JPEG);
+        pictureInfo.setHeight(468);
+        jpegValueModel.setPictureInfo(pictureInfo);
+        jpegValueModel.setValueType(CellValueType.PICTURE);
+        cell4.setValueModel(jpegValueModel);
+        CellStyleModel styleModel4 = new CellStyleModel();
+        cell4.setStyleModel(styleModel4);
+
+        cell4.setValue(new File(ExportHelperTest.class.getClassLoader().getResource("test.jpg").getPath()));
+        row1.add(cell4);
+        cell4.setOrder(4);
+
+        RowModel contentRow1 = new RowModel();
+        contentRow1.setCellModels(row1);
+        contentRow1.setOrder(1);
+
+        List<RowModel> content = Collections.singletonList(contentRow1);
         excelModel.setContent(content);
 
-        excelModel.setContent(content);
-        List<List<List<CellModel>>> contentList = new ArrayList<>();
+        Collections.sort(row1);
+        List<List<RowModel>> contentList = new ArrayList<>();
         contentList.add(content);
         excelModel.setBigDataContent(contentList);
 
-        ExportHelper.writeToFile(excelModel, "test.xls", "D:\\develop\\data\\applogs\\");
+        excelModel.setContentRowHeight((short) 100);
+
+        ExportHelper.writeToFile(excelModel, "test.xls", "D:\\");
     }
 }

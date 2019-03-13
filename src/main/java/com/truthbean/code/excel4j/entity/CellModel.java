@@ -4,7 +4,7 @@ package com.truthbean.code.excel4j.entity;
  * @author TruthBean
  * @since 0.0.1
  */
-public class CellModel {
+public class CellModel implements Comparable<CellModel> {
 
     /**
      * cell name
@@ -68,6 +68,15 @@ public class CellModel {
     }
 
     public void setStyleModel(CellStyleModel styleModel) {
+        if (styleModel.getColumnWidth() == 0 && value instanceof String) {
+            int size = ((String) value).length();
+            styleModel.setColumnWidth((size + 2) * 2 * 256);
+        }
         this.styleModel = styleModel;
+    }
+
+    @Override
+    public int compareTo(CellModel o) {
+        return order - o.order;
     }
 }
