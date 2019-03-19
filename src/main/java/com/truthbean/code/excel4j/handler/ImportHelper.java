@@ -3,6 +3,7 @@ package com.truthbean.code.excel4j.handler;
 import com.truthbean.code.excel4j.annotation.Column;
 import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.code.excel4j.handler.transform.TransformFactory;
+import com.truthbean.code.excel4j.util.ExcelUtils;
 import com.truthbean.code.excel4j.util.ReflectionUtils;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -25,9 +26,10 @@ public final class ImportHelper {
 
     /**
      * read data from excel file
-     * @param file file
+     *
+     * @param file       file
      * @param modelClass model class
-     * @param <T> t
+     * @param <T>        t
      * @return list of list string
      * @throws Exception
      */
@@ -38,11 +40,29 @@ public final class ImportHelper {
 
     /**
      * read data from excel file
+     *
      * @param file file
      * @return list of Map<String, String>
      * @throws Exception
      */
-    public static List<Map<String, String>> readDataFromExcel(File file)  throws Exception {
+    public static List<Map<String, String>> readDataFromExcel(File file) throws Exception {
+        List<Map<String, String>> contents = new ArrayList<>();
+        if (ExcelUtils.isExcel2003File(file.getName())) {
+
+        } else {
+            return readDataFromExcel2007(file);
+        }
+        return contents;
+    }
+
+    /**
+     * read data from excel file
+     *
+     * @param file file
+     * @return list of Map<String, String>
+     * @throws Exception
+     */
+    public static List<Map<String, String>> readDataFromExcel2007(File file) throws Exception {
         List<Map<String, String>> contents = new ArrayList<>();
         // The package open is instantaneous, as it should be.
         try (OPCPackage opcPackage = OPCPackage.open(file.getPath(), PackageAccess.READ)) {

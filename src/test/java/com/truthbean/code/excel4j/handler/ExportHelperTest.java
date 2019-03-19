@@ -90,11 +90,16 @@ public class ExportHelperTest {
         System.out.println(System.currentTimeMillis() - begin);
     }
 
-    //@Test
+    @Test
     public void handle() {
         List<CellEntityTest> list = new ArrayList<>();
+        CellEntityTest test = new CellEntityTest();
+        test.setTime(new Date());
+        test.setUserName("user");
+        test.setDecimal(new BigDecimal("-12345678890.01"));
+        list.add(test);
         ExcelModel excelModel = ExportHelper.handleData(list, CellEntityTest.class);
-        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\develop\\data\\applogs\\");
+        ExportHelper.writeToFile(excelModel, UUID.randomUUID().toString() + ".xls", "D:\\");
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.truthbean.code.excel4j.handler;
 
 import com.truthbean.code.excel4j.annotation.ExcelEntityHandler;
 import com.truthbean.code.excel4j.common.Constants;
-import com.truthbean.code.excel4j.common.WorkbookPictureType;
 import com.truthbean.code.excel4j.entity.*;
 import com.truthbean.code.excel4j.handler.transform.CellEntityValueHandler;
 import com.truthbean.code.excel4j.util.CellStyleHelper;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -196,7 +194,11 @@ public final class ExportHelper {
                 }
                 handleValue(cellModel, excelModel.getContentRowHeight(), isExcel2003, cell, excelModel.getWorkbook(), sheet);
             }
-            row.setHeight((short) (20 * excelModel.getContentRowHeight()));
+            if (excelModel.getContentRowHeight() <= 0) {
+                row.setHeight((short) -1);
+            } else {
+                row.setHeight((short) (20 * excelModel.getContentRowHeight()));
+            }
         }
         return workbook;
     }

@@ -9,6 +9,10 @@ import com.truthbean.code.excel4j.common.WorkbookPictureType;
 public class PictureInfo {
     private int height;
 
+    private int width;
+
+    private byte[] content;
+
     /**
      * if is media type
      */
@@ -28,5 +32,21 @@ public class PictureInfo {
 
     public void setType(WorkbookPictureType type) {
         this.type = type;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 }

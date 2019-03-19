@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 反射Utils 函数集合 提供访问私有变量, 获取泛型类型 Class, 提取集合中元素属性等 Utils 函数
+ *
  * @author TruthBean
  * @since 0.0.1
  */
@@ -209,9 +210,10 @@ public final class ReflectionUtils {
 
     /**
      * invoke set method
-     * @param target target object
-     * @param fieldName field name
-     * @param arg arg
+     *
+     * @param target         target object
+     * @param fieldName      field name
+     * @param arg            arg
      * @param parameterTypes arg type
      * @return invoke method result
      */
@@ -230,9 +232,10 @@ public final class ReflectionUtils {
 
     /**
      * invoke set method
-     * @param target target object
-     * @param fieldName field name
-     * @param arg arg
+     *
+     * @param target         target object
+     * @param fieldName      field name
+     * @param arg            arg
      * @param parameterTypes arg type
      * @return invoke method result
      */
@@ -246,17 +249,19 @@ public final class ReflectionUtils {
 
     /**
      * invoke get method
-     * @param target target object
+     *
+     * @param target    target object
      * @param fieldName field name
      * @return invoke method result
      */
     public static Object invokeGetMethod(Object target, String fieldName) {
         String methodName = "get" + handleFieldName(fieldName);
         try {
-            Method method = target.getClass().getMethod(methodName);
-            return method.invoke(target);
-        } catch (NoSuchMethodException e) {
-            LOGGER.warn(fieldName + " set method not found", e);
+            Method method = getDeclaredMethod(target, methodName, null);
+            if (method != null) {
+                method.setAccessible(true);
+                return method.invoke(target);
+            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn(fieldName + " invoke error", e);
         }
@@ -277,6 +282,7 @@ public final class ReflectionUtils {
 
     /**
      * make char of field name upper
+     *
      * @param fieldName filed name
      * @return string
      */
@@ -290,8 +296,9 @@ public final class ReflectionUtils {
 
     /**
      * invoke get method
+     *
      * @param target target object
-     * @param field field
+     * @param field  field
      * @return invoke method result
      */
     public static Object invokeGetMethod(Object target, Field field) {

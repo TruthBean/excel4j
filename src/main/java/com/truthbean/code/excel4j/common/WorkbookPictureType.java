@@ -59,4 +59,4 @@ public enum WorkbookPictureType {
     public int getType() {
         return type;
     }
-    }
+}

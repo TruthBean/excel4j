@@ -14,7 +14,7 @@ import java.util.Date;
  * @since 2018-01-14 20:13
  */
 @Sheet(name = "测试SHEET")
-@Table(bigTitle = "hello excel4j")
+@Table(bigTitle = "hello excel4j", rowHeight = 100)
 public class CellEntityTest extends CommonEntityTest {
 
     @Column(name = "ShortNum", columnValue = @ColumnValue(type = CellValueType.NUMBER))
