@@ -58,6 +58,13 @@ tasks.javadoc {
     }
 }
 
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.compilerArgs.add("-Xlint:unchecked")
+    options.isDebug = true
+    options.isFork = true
+}
+
 // 生成sources.jar
 val sourcesJar by tasks.registering(Jar::class) {
     group = "jar"
