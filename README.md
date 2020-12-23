@@ -1,5 +1,8 @@
 # excel4j
 
+NOTE:
+This project merged into https://github.com/truthbean/debbie, will not update any more
+
 ### desc
 
 This project use gradle build, you can learn from 
