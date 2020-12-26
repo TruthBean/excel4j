@@ -1,7 +1,7 @@
 # excel4j
 
 NOTE:
-This project merged into https://github.com/truthbean/debbie, will not update any more
+This project merged into https://github.com/truthbean/truthbean-projects, will not update any more
 
 ### desc
 
